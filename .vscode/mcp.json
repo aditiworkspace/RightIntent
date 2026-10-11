@@ -1,0 +1,21 @@
+{
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "supabase_access_token",
+      "description": "Supabase personal access token (sbp_...). The publishable key is not sufficient for MCP management access.",
+      "password": true
+    }
+  ],
+  "servers": {
+    "supabase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--access-token",
+        "${input:supabase_access_token}"
+      ]
+    }
+  }
+}
