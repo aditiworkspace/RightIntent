@@ -1,3 +1,3 @@
 import { AdminPage, AdminTable } from "@/components/admin/admin-page";
-
-export default function AdminCategoriesPage() { return <AdminPage eyebrow="Catalog" title="Categories" description="Organize the catalog into clear collections."><AdminTable columns={["Category", "Slug", "Status"]} rows={[["Objects", "objects", "Active"], ["Textiles", "textiles", "Active"], ["Tableware", "tableware", "Active"], ["Carry", "carry", "Active"]]} /></AdminPage>; }
+import { getAdminCategories } from "@/lib/supabase/admin-data";
+export default async function AdminCategoriesPage() { const categories = await getAdminCategories(); return <AdminPage eyebrow="Catalog" title="Categories" description="Organize the catalog into clear collections."><AdminTable columns={["Category","Slug","Status","Created"]} rows={categories.map((c) => [c.name,c.slug,c.is_active ? "Active" : "Hidden",new Date(c.created_at).toLocaleDateString("en-IN")])} /></AdminPage>; }

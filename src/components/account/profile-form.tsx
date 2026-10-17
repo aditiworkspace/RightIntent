@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { LoaderCircle, ShieldCheck } from "lucide-react";
 
 export function ProfileForm({
   email,
@@ -12,6 +13,7 @@ export function ProfileForm({
   const [name, setName] = useState(fullName);
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
+
   const save = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setSaving(true);
@@ -25,39 +27,61 @@ export function ProfileForm({
     setSaving(false);
     setMessage(
       response.ok
-        ? "Your details are saved."
+        ? "Your profile changes were saved successfully."
         : data.error || "Unable to save details.",
     );
   };
+
   return (
-    <form className="[max-width:550px] [margin-top:45px]" onSubmit={save}>
-      <label className="[display:flex] [flex-direction:column] [gap:8px] [margin-bottom:18px] [font:10px_var(--mono)] [text-transform:uppercase]">
-        Email
-        <input
-          value={email}
-          readOnly
-          className="[min-height:44px] [padding:0_12px] [border:1px_solid_var(--line)] [border-radius:0] [outline-color:var(--terra)] [background:transparent] [color:var(--ink)] [font:13px_var(--sans)] [text-transform:none]"
-        />
-      </label>
-      <label className="[display:flex] [flex-direction:column] [gap:8px] [margin-bottom:18px] [font:10px_var(--mono)] [text-transform:uppercase]">
-        Full name
-        <input
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-          required
-          className="[min-height:44px] [padding:0_12px] [border:1px_solid_var(--line)] [border-radius:0] [outline-color:var(--terra)] [background:transparent] [color:var(--ink)] [font:13px_var(--sans)] [text-transform:none]"
-        />
-      </label>
-      {message && (
-        <p className="[color:var(--terra)] [font-size:12px]">{message}</p>
-      )}
-      <button
-        className="button [min-height:46px] [display:inline-flex] [align-items:center] [justify-content:center] [gap:15px] [padding:0_21px] [font:10px_var(--mono)] [letter-spacing:.08em] [text-transform:uppercase] [transition:transform_.25s_ease,_background_.25s_ease] [&:hover]:[transform:translateY(-2px)] [color:var(--paper)] [background:var(--ink)]"
-        type="submit"
-        disabled={saving}
-      >
-        {saving ? "Saving..." : "Save changes"}
-      </button>
-    </form>
+    <div className="max-w-xl p-6 sm:p-8 rounded-2xl bg-white border border-[var(--line)] shadow-sm">
+      <form onSubmit={save} className="space-y-5">
+        <div>
+          <label className="block text-[10px] font-[family-name:var(--mono)] uppercase tracking-wider text-[var(--muted)] mb-1.5">
+            Registered Email Address
+          </label>
+          <input
+            value={email}
+            readOnly
+            className="editorial-input w-full bg-[var(--paper)] cursor-not-allowed opacity-80"
+          />
+          <span className="block mt-1.5 text-[11px] text-[var(--muted)]">
+            Primary identifier managed securely via Supabase Auth.
+          </span>
+        </div>
+
+        <div>
+          <label className="block text-[10px] font-[family-name:var(--mono)] uppercase tracking-wider text-[var(--muted)] mb-1.5">
+            Full Name
+          </label>
+          <input
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            required
+            placeholder="Your full legal or preferred name"
+            className="editorial-input w-full"
+          />
+        </div>
+
+        {message && (
+          <div className="p-3 rounded-lg bg-[var(--cream)]/60 text-[var(--ink)] text-[12px] font-[family-name:var(--mono)]">
+            {message}
+          </div>
+        )}
+
+        <div className="pt-2">
+          <button
+            type="submit"
+            disabled={saving}
+            className="editorial-btn editorial-btn-primary min-h-[46px]"
+          >
+            {saving ? (
+              <LoaderCircle className="animate-spin" size={16} />
+            ) : (
+              "Save profile changes"
+            )}
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }

@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { Check, LoaderCircle } from "lucide-react";
+import { Check, LoaderCircle, ArrowRight, Package, Calendar, Sparkles } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { RouteNav } from "@/components/store/route-page";
 
 type OrderState = { paymentStatus: string; status: string; totalInr: number };
 
@@ -34,45 +35,83 @@ export default function OrderSuccessPage() {
       );
   }, [orderId]);
 
-  if (!order)
-    return (
-      <main className="[&_h1]:[margin:0] [&_h1]:[font:400_clamp(46px,_6vw,_78px)/1_var(--serif)] [&_h1]:[letter-spacing:-.06em] [min-height:80vh] [display:flex] [flex-direction:column] [align-items:center] [justify-content:center] [padding:40px_20px] [text-align:center] [&>p:not(.eyebrow)]:[margin:22px_0_29px] [&>p:not(.eyebrow)]:[color:var(--muted)] [&>p:not(.eyebrow)]:[font-size:14px]">
-        <LoaderCircle className="[animation:spin_1s_linear_infinite]" size={28} />
-        <p>{message}</p>
-        <Link href="/account/orders" className="button [min-height:46px] [display:inline-flex] [align-items:center] [justify-content:center] [gap:15px] [padding:0_21px] [font:10px_var(--mono)] [letter-spacing:.08em] [text-transform:uppercase] [transition:transform_.25s_ease,_background_.25s_ease] [&:hover]:[transform:translateY(-2px)] [color:var(--paper)] [background:var(--ink)]">
-          View orders
-        </Link>
-      </main>
-    );
-  if (order.paymentStatus !== "paid")
-    return (
-      <main className="[&_h1]:[margin:0] [&_h1]:[font:400_clamp(46px,_6vw,_78px)/1_var(--serif)] [&_h1]:[letter-spacing:-.06em] [min-height:80vh] [display:flex] [flex-direction:column] [align-items:center] [justify-content:center] [padding:40px_20px] [text-align:center] [&>p:not(.eyebrow)]:[margin:22px_0_29px] [&>p:not(.eyebrow)]:[color:var(--muted)] [&>p:not(.eyebrow)]:[font-size:14px]">
-        <p className="eyebrow [margin:0_0_21px] [font:10px_var(--mono)] [letter-spacing:.14em] [text-transform:uppercase] [color:var(--muted)]">Payment pending</p>
-        <h1>We are confirming your payment.</h1>
-        <p>
-          Your order is saved and will update once Razorpay confirms the
-          payment.
-        </p>
-        <Link href="/account/orders" className="button [min-height:46px] [display:inline-flex] [align-items:center] [justify-content:center] [gap:15px] [padding:0_21px] [font:10px_var(--mono)] [letter-spacing:.08em] [text-transform:uppercase] [transition:transform_.25s_ease,_background_.25s_ease] [&:hover]:[transform:translateY(-2px)] [color:var(--paper)] [background:var(--ink)]">
-          View orders
-        </Link>
-      </main>
-    );
-
   return (
-    <main className="success-page [&_h1]:[margin:0] [&_h1]:[font:400_clamp(46px,_6vw,_78px)/1_var(--serif)] [&_h1]:[letter-spacing:-.06em] [min-height:80vh] [display:flex] [flex-direction:column] [align-items:center] [justify-content:center] [padding:40px_20px] [text-align:center] [&>p:not(.eyebrow)]:[margin:22px_0_29px] [&>p:not(.eyebrow)]:[color:var(--muted)] [&>p:not(.eyebrow)]:[font-size:14px]">
-      <div className="[width:70px] [height:70px] [display:grid] [place-items:center] [margin-bottom:25px] [border-radius:50%] [color:var(--paper)] [background:var(--terra)]">
-        <Check size={30} />
-      </div>
-      <p className="eyebrow [margin:0_0_21px] [font:10px_var(--mono)] [letter-spacing:.14em] [text-transform:uppercase] [color:var(--muted)]">Order confirmed</p>
-      <h1>Thank you for your purchase.</h1>
-      <p>
-        Your payment was verified successfully. Order total: Rs.{" "}
-        {order.totalInr.toLocaleString("en-IN")}.
-      </p>
-      <Link href="/products" className="button [min-height:46px] [display:inline-flex] [align-items:center] [justify-content:center] [gap:15px] [padding:0_21px] [font:10px_var(--mono)] [letter-spacing:.08em] [text-transform:uppercase] [transition:transform_.25s_ease,_background_.25s_ease] [&:hover]:[transform:translateY(-2px)] [color:var(--paper)] [background:var(--ink)]">
-        Continue shopping
-      </Link>
-    </main>
+    <>
+      <RouteNav />
+      <main className="min-h-[80vh] flex items-center justify-center px-4 py-16">
+        {!order ? (
+          <div className="text-center p-8 rounded-2xl bg-white border border-[var(--line)] shadow-sm max-w-md w-full">
+            <LoaderCircle className="animate-spin mx-auto text-[var(--terra)] mb-4" size={32} />
+            <p className="text-[14px] text-[var(--muted)] mb-6">{message}</p>
+            <Link href="/account/orders" className="editorial-btn editorial-btn-primary">
+              View your orders
+            </Link>
+          </div>
+        ) : order.paymentStatus !== "paid" ? (
+          <div className="text-center p-8 sm:p-12 rounded-2xl bg-white border border-[var(--line)] shadow-sm max-w-lg w-full">
+            <div className="w-14 h-14 rounded-full bg-[rgba(187,98,73,0.1)] text-[var(--terra)] flex items-center justify-center mx-auto mb-5">
+              <Package size={26} />
+            </div>
+            <span className="text-[10px] font-[family-name:var(--mono)] uppercase tracking-wider text-[var(--terra)]">
+              Payment In Progress
+            </span>
+            <h1 className="font-[family-name:var(--serif)] text-[clamp(28px,3vw,38px)] font-normal text-[var(--ink)] mt-2 mb-3">
+              We are confirming your payment.
+            </h1>
+            <p className="text-[14px] leading-relaxed text-[var(--muted)] mb-8">
+              Your order reference is saved. The status will automatically reflect once Razorpay reconciliation completes.
+            </p>
+            <Link href="/account/orders" className="editorial-btn editorial-btn-primary">
+              Go to order history <ArrowRight size={14} />
+            </Link>
+          </div>
+        ) : (
+          <div className="text-center p-8 sm:p-14 rounded-3xl bg-white border border-[var(--line)] shadow-xl max-w-xl w-full">
+            <div className="w-16 h-16 rounded-full bg-[#4f8055] text-white flex items-center justify-center mx-auto mb-6 shadow-md shadow-[#4f8055]/20">
+              <Check size={32} strokeWidth={2.5} />
+            </div>
+
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[rgba(79,128,85,0.1)] text-[#4f8055] font-[family-name:var(--mono)] text-[10px] uppercase tracking-wider mb-4">
+              <Sparkles size={11} /> Order Confirmed & Paid
+            </div>
+
+            <h1 className="font-[family-name:var(--serif)] text-[clamp(32px,4vw,44px)] font-normal text-[var(--ink)] m-0">
+              Thank you for your order.
+            </h1>
+            <p className="mt-3 text-[14px] text-[var(--muted)] leading-relaxed max-w-md mx-auto">
+              Your intentional tools are now being carefully packed and prepared for dispatch.
+            </p>
+
+            <div className="my-8 p-5 rounded-xl bg-[var(--cream)]/40 border border-[var(--line)] text-left space-y-2.5 font-[family-name:var(--mono)] text-[12px]">
+              <div className="flex justify-between">
+                <span className="text-[var(--muted)]">Order Reference:</span>
+                <span className="font-medium text-[var(--ink)]">
+                  #{orderId?.slice(-8).toUpperCase()}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[var(--muted)]">Amount Settled:</span>
+                <span className="font-medium text-[var(--ink)]">
+                  Rs. {order.totalInr.toLocaleString("en-IN")}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[var(--muted)]">Estimated Dispatch:</span>
+                <span className="font-medium text-[var(--ink)]">Within 24 business hours</span>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Link href="/products" className="editorial-btn editorial-btn-primary">
+                Continue browsing <ArrowRight size={14} />
+              </Link>
+              <Link href="/account/orders" className="editorial-btn editorial-btn-secondary">
+                View in orders
+              </Link>
+            </div>
+          </div>
+        )}
+      </main>
+    </>
   );
 }

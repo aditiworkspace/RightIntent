@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "eslint src",
     "seed:mongodb": "tsx scripts/seed-mongodb.ts",
     "db:indexes": "tsx scripts/create-mongodb-indexes.ts"
   },
