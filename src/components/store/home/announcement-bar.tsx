@@ -1,6 +1,11 @@
 import { Sparkles } from "lucide-react";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-export function AnnouncementBar() {
+export async function AnnouncementBar() {
+  const supabase = await createSupabaseServerClient();
+  const { data } = await supabase.from("site_settings").select("value").eq("key", "announcement").maybeSingle();
+  const settings = (data?.value ?? {}) as { enabled?: boolean; text?: string; linkText?: string; link?: string };
+  if (settings.enabled === false) return null;
   return (
     <div
       className={`
@@ -21,10 +26,10 @@ export function AnnouncementBar() {
       `}
     >
       <Sparkles size={14} />{" "}
-      <strong>Free 2027 calendar + intentions card on every order</strong>
+      <strong>{settings.text || "Free 2027 calendar + intentions card on every order"}</strong>
       <span>|</span>
       <span>Free shipping on orders over Rs. 2,000</span>
-      <a href="#journal">Join our community</a>
+      <a href={settings.link || "#journal"}>{settings.linkText || "Join our community"}</a>
       <button aria-label="Dismiss announcement">×</button>
     </div>
   );

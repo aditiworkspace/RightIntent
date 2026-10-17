@@ -17,7 +17,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
-      <body className="m-0 [background-color:var(--paper)] [color:var(--ink)] [font-family:var(--sans)]">
+      <body
+        suppressHydrationWarning
+        className="m-0 [background-color:var(--paper)] [color:var(--ink)] [font-family:var(--sans)]"
+      >
         {children}
       </body>
     </html>

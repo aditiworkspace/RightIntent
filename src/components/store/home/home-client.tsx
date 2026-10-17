@@ -11,11 +11,9 @@ import { FeaturedProducts } from "@/components/store/home/featured-products";
 import { CartDrawer } from "@/components/store/home/cart-drawer";
 
 export function HomeClient({
-  announcement,
   aboveFeatured,
   belowFeatured,
 }: {
-  announcement: ReactNode;
   aboveFeatured: ReactNode;
   belowFeatured: ReactNode;
 }) {
@@ -42,7 +40,6 @@ export function HomeClient({
   return (
     <main className="overflow-x-clip">
       <div className="[position:sticky] [top:0] [z-index:50]">
-        {announcement}
         <SiteHeader cartCount={cart.length} savedCount={saved.length} />
       </div>
       {aboveFeatured}

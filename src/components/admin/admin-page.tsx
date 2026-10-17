@@ -1,7 +1,87 @@
-export function AdminPage({ eyebrow, title, description, children }: { eyebrow: string; title: string; description?: string; children?: React.ReactNode }) {
-  return <div className="[max-width:1100px]"><p className="eyebrow [margin:0_0_21px] [font:10px_var(--mono)] [letter-spacing:.14em] [text-transform:uppercase] [color:var(--muted)]">{eyebrow}</p><div className="[display:flex] [align-items:end] [justify-content:space-between] [margin-bottom:50px] [&_h1]:[margin:0] [&_h1]:[font:400_52px_var(--serif)] [&_h1]:[letter-spacing:-.06em] [&_p]:[margin:13px_0_0] [&_p]:[color:var(--muted)] [&_p]:[font-size:13px] max-[800px]:[align-items:start] max-[800px]:[flex-direction:column] max-[800px]:[gap:22px] max-[800px]:[&_h1]:[font-size:43px]"><div><h1>{title}</h1>{description && <p>{description}</p>}</div><button className="button [min-height:46px] [display:inline-flex] [align-items:center] [justify-content:center] [gap:15px] [padding:0_21px] [font:10px_var(--mono)] [letter-spacing:.08em] [text-transform:uppercase] [transition:transform_.25s_ease,_background_.25s_ease] [&:hover]:[transform:translateY(-2px)] [color:var(--paper)] [background:var(--ink)]">Create new</button></div>{children}</div>;
+export function AdminPage({
+  eyebrow,
+  title,
+  description,
+  children,
+}: {
+  eyebrow: string;
+  title: string;
+  description?: string;
+  children?: React.ReactNode;
+}) {
+  return (
+    <div className="w-full">
+      <div className="mb-8 pb-6 border-b border-[var(--line)]">
+        <span className="font-[family-name:var(--mono)] text-[10px] uppercase tracking-[0.16em] text-[var(--terra)]">
+          {eyebrow}
+        </span>
+        <h1 className="font-[family-name:var(--serif)] text-[clamp(32px,3.5vw,46px)] font-normal tracking-tight text-[var(--ink)] mt-1 mb-2">
+          {title}
+        </h1>
+        {description && (
+          <p className="text-[14px] text-[var(--muted)] max-w-2xl m-0 leading-relaxed">
+            {description}
+          </p>
+        )}
+      </div>
+      {children}
+    </div>
+  );
 }
 
-export function AdminTable({ columns, rows }: { columns: string[]; rows: string[][] }) {
-  return <div className="[border-top:1px_solid_var(--line)] max-[800px]:[overflow-x:auto]"><div className="[display:grid] [grid-template-columns:1.5fr_1fr_1fr_1fr] [gap:12px] [padding:18px_0] [border-bottom:1px_solid_var(--line)] [font:11px_var(--mono)] max-[800px]:[min-width:600px] [color:var(--muted)] [font-size:9px] [text-transform:uppercase]">{columns.map((column) => <span key={column}>{column}</span>)}</div>{rows.map((row, index) => <div className="[display:grid] [grid-template-columns:1.5fr_1fr_1fr_1fr] [gap:12px] [padding:18px_0] [border-bottom:1px_solid_var(--line)] [font:11px_var(--mono)] max-[800px]:[min-width:600px]" key={`${row[0]}-${index}`}>{row.map((cell, cellIndex) => <span key={`${cell}-${cellIndex}`}>{cell}</span>)}</div>)}</div>;
+export function AdminTable({
+  columns,
+  rows,
+}: {
+  columns: string[];
+  rows: string[][];
+}) {
+  return (
+    <div className="w-full overflow-hidden rounded-2xl bg-white border border-[var(--line)] shadow-sm">
+      <div className="overflow-x-auto">
+        <table className="w-full text-left border-collapse">
+          <thead>
+            <tr className="border-b border-[var(--line)] bg-[var(--paper)]/60">
+              {columns.map((column) => (
+                <th
+                  key={column}
+                  className="py-3.5 px-5 font-[family-name:var(--mono)] text-[10px] uppercase tracking-wider text-[var(--muted)] font-medium"
+                >
+                  {column}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-[rgba(28,38,34,0.06)] text-[13px]">
+            {rows.length ? (
+              rows.map((row, index) => (
+                <tr
+                  key={`${row[0]}-${index}`}
+                  className="hover:bg-[rgba(28,38,34,0.02)] transition-colors"
+                >
+                  {row.map((cell, cellIndex) => (
+                    <td
+                      key={`${cell}-${cellIndex}`}
+                      className="py-4 px-5 font-[family-name:var(--sans)] text-[var(--ink)]"
+                    >
+                      {cell}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan={columns.length}
+                  className="py-12 text-center text-[var(--muted)] font-[family-name:var(--mono)] text-[12px]"
+                >
+                  No records found in this collection.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 }

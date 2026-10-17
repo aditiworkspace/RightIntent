@@ -41,8 +41,8 @@ export default function Home() {
           }}
         />
       )}
+      <AnnouncementBar />
       <HomeClient
-        announcement={<AnnouncementBar />}
         aboveFeatured={
           <>
             <HeroSection />

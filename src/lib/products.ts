@@ -8,6 +8,7 @@ export type Product = {
   image: string;
   accent: string;
   badge?: string;
+  stock?: number;
 };
 
 export const products: Product[] = [

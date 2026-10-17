@@ -1,0 +1,5 @@
+import { notFound } from "next/navigation";
+import { AdminPage } from "@/components/admin/admin-page";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { ProductForm } from "@/components/admin/product-form";
+export default async function EditProductPage({ params }: { params: Promise<{ id: string }> }) { const { id } = await params; const supabase = await createSupabaseServerClient(); const { data } = await supabase.from("products").select("*, inventory(quantity), product_images(id,storage_path,alt_text,sort_order)").eq("id", id).single(); if (!data) notFound(); return <AdminPage eyebrow="Catalog / Edit" title={data.name} description="Update product details and storefront visibility."><ProductForm images={data.product_images ?? []} initial={{ id: data.id, name: data.name, slug: data.slug, description: data.description, priceInr: String(data.price_inr), salePriceInr: data.sale_price_inr ? String(data.sale_price_inr) : "", sku: data.sku, stock: String(data.inventory?.[0]?.quantity ?? 0), isPublished: data.is_published }} /></AdminPage>; }

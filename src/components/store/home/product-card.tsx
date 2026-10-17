@@ -40,9 +40,10 @@ export function ProductCard({
           alt=""
           fill
           sizes="(max-width: 960px) 50vw, 25vw"
+          unoptimized
           className="[object-fit:cover]"
         />
-        <button
+        {product.stock !== undefined && product.stock < 1 ? <span className="out-of-stock-badge">Out of stock</span> : <button
           className={`${saved ? "wish-button saved" : "wish-button"} [position:absolute] [top:15px] [right:15px] [z-index:2] [width:36px] [height:36px] [display:grid] [place-items:center] [border-radius:50%] [background:var(--paper)] [transition:color_.2s_ease] [&:hover]:[color:var(--terra)] [&.saved]:[color:var(--terra)]`}
           aria-label={
             saved
@@ -52,7 +53,7 @@ export function ProductCard({
           onClick={onSave}
         >
           <Heart size={18} fill={saved ? "currentColor" : "none"} />
-        </button>
+        </button>}
         {product.badge && (
           <span className="[position:absolute] [top:19px] [left:17px] [z-index:2] [font:9px_var(--mono)] [letter-spacing:.07em] [text-transform:uppercase]">
             {product.badge}

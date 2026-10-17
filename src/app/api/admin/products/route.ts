@@ -1,41 +1,11 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { connectToDatabase } from "@/lib/mongodb";
-import { ProductModel, ProfileModel } from "@/lib/models";
+import { getCurrentAdminAccess } from "@/lib/auth/admin";
 import { revalidateTag } from "next/cache";
-import {
-  measureAuthentication,
-  measureDatabaseConnection,
-  measureDatabaseQuery,
-  withApiPerformance,
-  type ApiPerformanceMetrics,
-} from "@/lib/api-performance";
 
-const schema = z.object({ name: z.string().trim().min(2), slug: z.string().trim().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/), description: z.string().trim().min(10), category: z.string().trim().min(2), priceInr: z.coerce.number().int().nonnegative(), sku: z.string().trim().min(2), stock: z.coerce.number().int().nonnegative(), isPublished: z.boolean().default(false) });
-
-async function admin(metrics: ApiPerformanceMetrics) {
-  const supabase = await createSupabaseServerClient();
-  const { data: { user } } = await measureAuthentication(metrics, () => supabase.auth.getUser());
-  if (!user) return null;
-  await measureDatabaseConnection(metrics, connectToDatabase);
-  return (await measureDatabaseQuery(metrics, () => ProfileModel.findOne({ authUserId: user.id }).select("role").lean()))?.role === "admin";
-}
-
-export const POST = withApiPerformance("/api/admin/products", async (request, metrics) => {
-  if (!(await admin(metrics))) return NextResponse.json({ error: "Admin access required." }, { status: 403 });
-  const parsed = schema.safeParse(await request.json());
-  if (!parsed.success) return NextResponse.json({ error: "Product details are invalid." }, { status: 400 });
-  try {
-    const product = await measureDatabaseQuery(metrics, () => ProductModel.create(parsed.data));
-    revalidateTag("catalog", "max");
-    return NextResponse.json({ product }, { status: 201 });
-  }
-  catch (error) {
-    if (error instanceof Error && "code" in error && error.code === 11000) {
-      return NextResponse.json({ error: "A product with this slug or SKU already exists." }, { status: 409 });
-    }
-    console.error("Product creation failed", error instanceof Error ? error.name : "UnknownError");
-    return NextResponse.json({ error: "Unable to create product." }, { status: 500 });
-  }
-});
+const schema = z.object({ id: z.string().uuid().optional(), name: z.string().trim().min(2), slug: z.string().trim().toLowerCase().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/), description: z.string().trim().min(10), categoryId: z.string().uuid().nullable().optional(), priceInr: z.coerce.number().int().nonnegative(), salePriceInr: z.coerce.number().int().nonnegative().nullable().optional(), sku: z.string().trim().min(2), stock: z.coerce.number().int().nonnegative(), isPublished: z.boolean().default(false), seoTitle: z.string().max(160).optional(), seoDescription: z.string().max(320).optional() });
+async function guard() { const access = await getCurrentAdminAccess(); return access?.isAdmin ? null : NextResponse.json({ error: "Admin access required." }, { status: access ? 403 : 401 }); }
+export async function GET() { const denied = await guard(); if (denied) return denied; const supabase = await createSupabaseServerClient(); const { data, error } = await supabase.from("products").select("*, categories(name), inventory(quantity)").order("created_at", { ascending: false }); if (error) return NextResponse.json({ error: error.message }, { status: 500 }); return NextResponse.json({ products: data }); }
+export async function POST(request: Request) { const denied = await guard(); if (denied) return denied; const parsed = schema.safeParse(await request.json()); if (!parsed.success) return NextResponse.json({ error: "Product details are invalid.", fields: parsed.error.flatten().fieldErrors }, { status: 400 }); const { id, stock, ...p } = parsed.data; const supabase = await createSupabaseServerClient(); const values = { name: p.name, slug: p.slug, description: p.description, category_id: p.categoryId ?? null, price_inr: p.priceInr, sale_price_inr: p.salePriceInr ?? null, sku: p.sku, is_published: p.isPublished, seo_title: p.seoTitle ?? null, seo_description: p.seoDescription ?? null, updated_at: new Date().toISOString() }; const result = id ? await supabase.from("products").update(values).eq("id", id).select().single() : await supabase.from("products").insert(values).select().single(); if (result.error) return NextResponse.json({ error: result.error.message }, { status: 400 }); const inventory = await supabase.from("inventory").upsert({ product_id: result.data.id, quantity: stock }, { onConflict: "product_id" }); if (inventory.error) return NextResponse.json({ error: inventory.error.message }, { status: 400 }); revalidateTag("catalog", "max"); return NextResponse.json({ product: result.data }, { status: id ? 200 : 201 }); }
+export async function DELETE(request: Request) { const denied = await guard(); if (denied) return denied; const id = new URL(request.url).searchParams.get("id"); if (!id) return NextResponse.json({ error: "Product id is required." }, { status: 400 }); const supabase = await createSupabaseServerClient(); const { error } = await supabase.from("products").delete().eq("id", id); if (error) return NextResponse.json({ error: error.message }, { status: 400 }); revalidateTag("catalog", "max"); return NextResponse.json({ ok: true }); }
