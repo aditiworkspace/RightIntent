@@ -6,7 +6,7 @@ import Link from "next/link";
 import { connectToDatabase } from "@/lib/mongodb";
 import { OrderModel } from "@/lib/models";
 import { PageLoading } from "@/components/store/page-loading";
-import { Package, ArrowRight, ArrowLeft, Clock, CheckCircle } from "lucide-react";
+import { Package, ArrowRight, ArrowLeft } from "lucide-react";
 
 export default function AccountOrdersPage() {
   return (

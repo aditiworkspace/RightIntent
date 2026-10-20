@@ -53,6 +53,7 @@ export const POST = withApiPerformance("/api/payments/verify", async (request, m
     order.status = "confirmed";
     order.razorpayPaymentId = body.razorpayPaymentId;
     await measureDatabaseQuery(metrics, () => order.save());
+
     return NextResponse.json({ ok: true, orderId: String(order._id) });
   } catch (error) {
     console.error("Razorpay payment verification failed", error);

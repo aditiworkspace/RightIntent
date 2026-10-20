@@ -1,4 +1,4 @@
-import { Heart, Compass } from "lucide-react";
+import { Heart } from "lucide-react";
 import { RouteNav, RoutePage } from "@/components/store/route-page";
 import { ContinueLink } from "@/components/store/product-tile";
 

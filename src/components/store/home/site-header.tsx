@@ -7,9 +7,11 @@ import { usePathname, useRouter } from "next/navigation";
 import { ArrowRight, Compass, Heart, House, LoaderCircle, Menu, Search, ShoppingBag, Store, X } from "lucide-react";
 import { BrandLogo } from "@/components/store/brand-logo";
 import { AuthButton } from "@/components/store/auth-button";
+import { useCartStore } from "@/lib/cart-store";
+import { useMounted } from "@/lib/use-mounted";
 import styles from "./site-header.module.css";
 
-type SiteHeaderProps = { cartCount: number; savedCount: number };
+type SiteHeaderProps = { cartCount?: number; savedCount?: number };
 type SearchSuggestion = {
   id: string;
   slug: string;
@@ -19,9 +21,16 @@ type SearchSuggestion = {
   image: string;
 };
 
-export function SiteHeader({ cartCount, savedCount }: SiteHeaderProps) {
+export function SiteHeader({ cartCount, savedCount = 0 }: SiteHeaderProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const mounted = useMounted();
+  const storeCartCount = useCartStore((state) =>
+    state.items.reduce((sum, item) => sum + item.quantity, 0)
+  );
+  const displayCartCount = mounted
+    ? (cartCount !== undefined ? cartCount : storeCartCount)
+    : 0;
   const isSearchPage = pathname === "/search";
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -32,6 +41,9 @@ export function SiteHeader({ cartCount, savedCount }: SiteHeaderProps) {
   const [activeSuggestion, setActiveSuggestion] = useState(-1);
   const searchRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const mobileSearchRef = useRef<HTMLFormElement>(null);
+  const mobileSearchInputRef = useRef<HTMLInputElement>(null);
+  const mobileSearchToggleRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const trimmedQuery = query.trim();
@@ -69,7 +81,12 @@ export function SiteHeader({ cartCount, savedCount }: SiteHeaderProps) {
     if (!searchOpen) return;
 
     const handlePointerDown = (event: PointerEvent) => {
-      if (event.target instanceof Node && !searchRef.current?.contains(event.target)) {
+      if (
+        event.target instanceof Node &&
+        !searchRef.current?.contains(event.target) &&
+        !mobileSearchRef.current?.contains(event.target) &&
+        !mobileSearchToggleRef.current?.contains(event.target)
+      ) {
         setSearchOpen(false);
       }
     };
@@ -77,6 +94,18 @@ export function SiteHeader({ cartCount, savedCount }: SiteHeaderProps) {
     document.addEventListener("pointerdown", handlePointerDown);
     return () => document.removeEventListener("pointerdown", handlePointerDown);
   }, [searchOpen]);
+
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileOpen]);
 
   const openSearch = () => {
     setSearchOpen(true);
@@ -120,6 +149,7 @@ export function SiteHeader({ cartCount, savedCount }: SiteHeaderProps) {
         className={`
         [height:68px] [display:flex] [align-items:center] [justify-content:space-between]
         [padding:0_5vw] [border-bottom:1px_solid_var(--line)] [position:relative] [z-index:1]
+        ${mobileOpen ? "max-[960px]:[z-index:90]" : ""}
         [background:var(--brand-paper)] max-[960px]:[height:70px]
         max-[960px]:[padding:0_20px]
       `}
@@ -127,11 +157,15 @@ export function SiteHeader({ cartCount, savedCount }: SiteHeaderProps) {
         <button
           className="[display:none] max-[960px]:[display:block]"
           aria-label="Open menu"
-          onClick={() => setMobileOpen(true)}
+          onClick={() => {
+            setSearchOpen(false);
+            setMobileOpen(true);
+          }}
         >
           <Menu size={21} />
         </button>
-        <div
+        <Link
+          href="/"
           className={`
           [display:flex] [align-items:center] [gap:12px] [&_.brand-logo]:[width:58px]
           [&_.brand-logo]:[height:58px] [&>div]:[display:flex] [&>div]:[flex-direction:column]
@@ -139,39 +173,56 @@ export function SiteHeader({ cartCount, savedCount }: SiteHeaderProps) {
           [&_small]:[font:500_7px_var(--sans)] [&_small]:[letter-spacing:.18em] [&_small]:[color:var(--muted)]
           max-[960px]:[&_.brand-logo]:[width:48px] max-[960px]:[&_.brand-logo]:[height:48px]
           max-[960px]:[&_strong]:[font-size:16px] max-[960px]:[&_small]:[font-size:6px]
+          [color:inherit] [text-decoration:none] cursor-pointer
         `}
+          aria-label="Right Intent - Home"
         >
-          <BrandLogo href="#top" label="Right Intent" />
+          <BrandLogo href="" label="Right Intent" />
           <div>
             <strong>RIGHT INTENT</strong>
             <small>BUILD WITH PURPOSE.</small>
           </div>
-        </div>
+        </Link>
+        {mobileOpen && (
+          <button
+            type="button"
+            className={styles.mobileMenuBackdrop}
+            aria-label="Close menu"
+            onClick={() => setMobileOpen(false)}
+          />
+        )}
         <nav
-          className={`${mobileOpen ? "main-nav is-open" : "main-nav"} [display:flex] [flex:1] [justify-content:center] [gap:30px] [margin-left:0] [font:11px_var(--sans)] [&_a]:[transition:color_.2s_ease] [&_a:hover]:[color:var(--terra)] max-[960px]:[position:fixed] max-[960px]:[inset:0] max-[960px]:[z-index:20] max-[960px]:[display:none] max-[960px]:[flex-direction:column] max-[960px]:[align-items:center] max-[960px]:[justify-content:center] max-[960px]:[gap:25px] max-[960px]:[margin:0] max-[960px]:[background:var(--brand-paper)] max-[960px]:[font-size:14px] max-[960px]:[&.is-open]:[display:flex]`}
+          className={`${styles.mainNav} ${mobileOpen ? styles.mainNavOpen : ""}`}
           aria-label="Main navigation"
         >
           <button
-            className="[display:none] max-[960px]:[display:block] max-[960px]:[position:absolute] max-[960px]:[top:24px] max-[960px]:[right:20px]"
+            className={styles.mobileMenuClose}
             aria-label="Close menu"
             onClick={() => setMobileOpen(false)}
           >
             <X size={21} />
           </button>
+          <div className={styles.mobileMenuIntro}>
+            <span>RIGHT INTENT / MENU</span>
+            <h2>Make room for<br />what matters.</h2>
+          </div>
           <Link href="/products" onClick={() => setMobileOpen(false)}>
-            Shop all
+            Shop all <ArrowRight className={styles.mobileMenuArrow} size={16} aria-hidden="true" />
           </Link>
           <Link href="/category/objects" onClick={() => setMobileOpen(false)}>
-            Collections
+            Collections <ArrowRight className={styles.mobileMenuArrow} size={16} aria-hidden="true" />
           </Link>
           <Link href="/#intelligent-trader" onClick={() => setMobileOpen(false)}>
-            Intelligent Trader
+            Intelligent Trader <ArrowRight className={styles.mobileMenuArrow} size={16} aria-hidden="true" />
           </Link>
           <Link href="/#story" onClick={() => setMobileOpen(false)}>
-            Our story
+            Our story <ArrowRight className={styles.mobileMenuArrow} size={16} aria-hidden="true" />
           </Link>
           <Link href="/#journal" onClick={() => setMobileOpen(false)}>
-            Journal
+            Journal <ArrowRight className={styles.mobileMenuArrow} size={16} aria-hidden="true" />
+          </Link>
+          <Link href="/account" onClick={() => setMobileOpen(false)}>
+            Account <ArrowRight className={styles.mobileMenuArrow} size={16} aria-hidden="true" />
           </Link>
         </nav>
         <div
@@ -185,6 +236,25 @@ export function SiteHeader({ cartCount, savedCount }: SiteHeaderProps) {
         `}
         >
           <AuthButton />
+          {!isSearchPage && (
+            <div className={styles.mobileSearchToggle}>
+              <button
+                ref={mobileSearchToggleRef}
+                type="button"
+                aria-label={searchOpen ? "Close search" : "Open search"}
+                aria-expanded={searchOpen}
+                onClick={() => {
+                  const shouldOpen = !searchOpen;
+                  setSearchOpen(shouldOpen);
+                  if (shouldOpen) {
+                    window.setTimeout(() => mobileSearchInputRef.current?.focus(), 0);
+                  }
+                }}
+              >
+                {searchOpen ? <X size={19} /> : <Search size={19} />}
+              </button>
+            </div>
+          )}
           {!isSearchPage && <div className={styles.searchControl} ref={searchRef}>
           <button
             type="button"
@@ -284,16 +354,18 @@ export function SiteHeader({ cartCount, savedCount }: SiteHeaderProps) {
           </Link>
           <Link href="/cart" aria-label="Open cart" className="cart-button [&_small:empty]:[display:none]">
             <ShoppingBag size={19} />
-            <small>{cartCount || ""}</small>
+            <small>{displayCartCount || ""}</small>
           </Link>
         </div>
       </header>
-      {!isSearchPage && <form className={styles.mobileSearch} role="search" onSubmit={submitSearch}>
+      {!isSearchPage && searchOpen && <form ref={mobileSearchRef} className={styles.mobileSearch} role="search" onSubmit={submitSearch}>
         <Search size={18} aria-hidden="true" />
         <input
+          ref={mobileSearchInputRef}
           type="search"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
+          onKeyDown={handleSearchKeyDown}
           placeholder="Search journals, planners & gifts"
           aria-label="Search products"
         />
@@ -320,7 +392,7 @@ export function SiteHeader({ cartCount, savedCount }: SiteHeaderProps) {
         </Link>
         <Link href="/cart" aria-current={pathname === "/cart" ? "page" : undefined}>
           <ShoppingBag size={19} aria-hidden="true" />
-          <span>Bag{cartCount > 0 ? ` (${cartCount})` : ""}</span>
+          <span>Bag{displayCartCount > 0 ? ` (${displayCartCount})` : ""}</span>
         </Link>
       </nav>
     </>

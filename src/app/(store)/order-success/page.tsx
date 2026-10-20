@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Check, LoaderCircle, ArrowRight, Package, Calendar, Sparkles } from "lucide-react";
+import { Check, LoaderCircle, ArrowRight, Package, Sparkles } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { RouteNav } from "@/components/store/route-page";

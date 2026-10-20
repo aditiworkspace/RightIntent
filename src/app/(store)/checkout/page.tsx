@@ -4,14 +4,11 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
   ArrowLeft,
-  Check,
   LoaderCircle,
   LockKeyhole,
   X,
   ShieldCheck,
   MapPin,
-  Tag,
-  CreditCard,
   Plus,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -63,10 +60,7 @@ export default function CheckoutPage() {
     const load = async () => {
       try {
         const supabase = createSupabaseBrowserClient();
-        const [{ data: { session } }, response] = await Promise.all([
-          supabase.auth.getSession(),
-          fetch("/api/account/addresses"),
-        ]);
+        const { data: { session } } = await supabase.auth.getSession();
         const user = session?.user;
         if (!user) {
           router.replace("/login?next=/checkout");
@@ -75,6 +69,8 @@ export default function CheckoutPage() {
         setEmail(user.email || "");
         setPhone(user.phone?.replace(/^\+91/, "") || "");
         setPhoneVerified(Boolean(user.phone));
+
+        const response = await fetch("/api/account/addresses");
         if (response.status === 401) {
           router.replace("/login?next=/checkout");
           return;

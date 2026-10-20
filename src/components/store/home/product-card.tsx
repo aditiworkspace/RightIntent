@@ -1,99 +1,182 @@
 "use client";
 
+import Link from "next/link";
 import Image from "next/image";
-import { Heart, Plus } from "lucide-react";
+import { Eye, Heart, Plus, Sparkles, Star } from "lucide-react";
 import type { Product } from "@/lib/products";
+import type { CatalogProduct } from "@/lib/catalog";
 import { formatPrice } from "./format-price";
+
+interface ProductCardProps {
+  product: Product | CatalogProduct;
+  saved: boolean;
+  onSave: () => void;
+  onAdd: () => void;
+  onQuickView?: (product: any) => void;
+}
 
 export function ProductCard({
   product,
   saved,
   onSave,
   onAdd,
-}: {
-  product: Product;
-  saved: boolean;
-  onSave: () => void;
-  onAdd: () => void;
-}) {
+  onQuickView,
+}: ProductCardProps) {
+  const catProd = product as CatalogProduct;
+  const slug = catProd.slug ?? product.name.toLowerCase().replaceAll(" ", "-");
+  const inStock = product.stock === undefined || product.stock > 0;
+
+  const compareAt = (product as any).compareAt;
+  const hasDiscount = compareAt && compareAt > product.price;
+  const discountPercent = hasDiscount
+    ? Math.round(((compareAt - product.price) / compareAt) * 100)
+    : 0;
+
   return (
-    <article
-      className={`
-      [&:hover_.product-image]:[transform:translateY(-5px)]
-      [&:hover_.product-image:after]:[background:rgba(28,_38,_34,_.08)]
-      [&:hover_.quick-add]:[opacity:1] [&:hover_.quick-add]:[transform:translateY(0)]
-    `}
-    >
-      <div
-        className={`
-          product-image [height:395px] [background-position:center] [background-size:cover]
-          [position:relative] [overflow:hidden] [transition:transform_.4s_ease] [&:after]:[content:'']
-          [&:after]:[position:absolute] [&:after]:[inset:0] [&:after]:[background:rgba(28,_38,_34,_0)]
-          [&:after]:[transition:background_.3s_ease] max-[960px]:[height:235px]
-        `}
-        style={{
-          backgroundColor: product.accent,
-        }}
-      >
-        <Image
-          src={product.image}
-          alt=""
-          fill
-          sizes="(max-width: 960px) 50vw, 25vw"
-          unoptimized
-          className="[object-fit:cover]"
-        />
-        {product.stock !== undefined && product.stock < 1 ? <span className="out-of-stock-badge">Out of stock</span> : <button
-          className={`${saved ? "wish-button saved" : "wish-button"} [position:absolute] [top:15px] [right:15px] [z-index:2] [width:36px] [height:36px] [display:grid] [place-items:center] [border-radius:50%] [background:var(--paper)] [transition:color_.2s_ease] [&:hover]:[color:var(--terra)] [&.saved]:[color:var(--terra)]`}
-          aria-label={
-            saved
-              ? `Remove ${product.name} from saved items`
-              : `Save ${product.name}`
-          }
-          onClick={onSave}
-        >
-          <Heart size={18} fill={saved ? "currentColor" : "none"} />
-        </button>}
-        {product.badge && (
-          <span className="[position:absolute] [top:19px] [left:17px] [z-index:2] [font:9px_var(--mono)] [letter-spacing:.07em] [text-transform:uppercase]">
-            {product.badge}
-          </span>
-        )}
+    <article className="group relative flex flex-col justify-between bg-white rounded-2xl border border-[rgba(28,38,34,0.08)] p-3 sm:p-3.5 transition-all duration-350 ease-out hover:shadow-[0_18px_32px_-6px_rgba(28,38,34,0.12)] hover:border-[rgba(187,98,73,0.35)] hover:-translate-y-1.5">
+      <div>
+        {/* Studio Pedestal Image Frame */}
+        <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl bg-gradient-to-b from-[#faf8f4] via-[#f5f1e8] to-[#ede7dc] border border-[rgba(28,38,34,0.05)] mb-2.5 flex items-center justify-center p-3">
+          {/* Sunlight sheen foil shimmer on hover */}
+          <div className="sheen-effect" />
+
+          {/* Product Image Link */}
+          <Link
+            href={`/products/${slug}`}
+            className="absolute inset-0 z-0 flex items-center justify-center"
+            aria-label={product.name}
+          >
+            {product.image ? (
+              <Image
+                src={product.image}
+                alt={product.name}
+                fill
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                unoptimized
+                className="object-contain p-2.5 sm:p-3 transition-transform duration-500 ease-out group-hover:scale-106 group-hover:-translate-y-1 drop-shadow-[0_8px_16px_rgba(28,38,34,0.12)] group-hover:drop-shadow-[0_14px_22px_rgba(28,38,34,0.18)]"
+              />
+            ) : (
+              <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center bg-[var(--cream)]">
+                <span className="font-[family-name:var(--serif)] text-[16px] text-[var(--ink)] opacity-60 font-normal">
+                  {product.name}
+                </span>
+                <span className="mt-1 font-[family-name:var(--mono)] text-[8px] uppercase tracking-widest text-[var(--muted)]">
+                  Right Intent · Studio
+                </span>
+              </div>
+            )}
+          </Link>
+
+          {/* Category & Discount Badges */}
+          <div className="absolute top-2 left-2 flex flex-wrap gap-1 z-10 pointer-events-none">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/90 backdrop-blur-md border border-[rgba(28,38,34,0.08)] font-[family-name:var(--mono)] text-[8.5px] uppercase tracking-wider text-[var(--ink)] shadow-2xs">
+              <Sparkles size={8} className="text-[var(--terra)]" />
+              {product.category}
+            </span>
+            {hasDiscount && (
+              <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-[#eaf4eb] text-[#2d6833] border border-[#cbe6cd] font-[family-name:var(--mono)] text-[8.5px] font-semibold tracking-wider uppercase shadow-2xs">
+                Save {discountPercent}%
+              </span>
+            )}
+            {product.badge && !hasDiscount && (
+              <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-[var(--terra)] text-white font-[family-name:var(--mono)] text-[8.5px] tracking-wider uppercase shadow-2xs">
+                {product.badge}
+              </span>
+            )}
+          </div>
+
+          {/* Wishlist Heart Button */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onSave();
+            }}
+            className={`absolute top-2 right-2 z-20 w-7 h-7 rounded-full flex items-center justify-center backdrop-blur-md border transition-all duration-300 ${
+              saved
+                ? "bg-white text-[var(--terra)] border-[var(--terra)] shadow-2xs animate-heart-pop"
+                : "bg-white/85 text-[var(--muted)] border-[rgba(28,38,34,0.08)] hover:text-[var(--ink)] hover:bg-white"
+            }`}
+            aria-label={saved ? `Remove ${product.name} from saved items` : `Save ${product.name}`}
+          >
+            <Heart size={13} fill={saved ? "currentColor" : "none"} />
+          </button>
+
+          {/* Quick View Button on Desktop Hover */}
+          {onQuickView && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onQuickView(product);
+              }}
+              className="absolute bottom-2 inset-x-3 z-20 hidden sm:flex items-center justify-center gap-1.5 py-1.5 rounded-lg bg-white/95 backdrop-blur-md border border-[rgba(28,38,34,0.1)] text-[var(--ink)] font-[family-name:var(--mono)] text-[9.5px] uppercase tracking-wider font-medium shadow-sm opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 hover:bg-[var(--ink)] hover:text-white"
+            >
+              <Eye size={12} /> Quick View
+            </button>
+          )}
+
+          {/* Out of Stock Overlay */}
+          {!inStock && (
+            <div className="absolute inset-x-2 bottom-2 py-1 text-center rounded-md bg-[rgba(28,38,34,0.85)] text-[var(--paper)] font-[family-name:var(--mono)] text-[8.5px] tracking-wider uppercase backdrop-blur-sm z-10 pointer-events-none">
+              Out of stock
+            </div>
+          )}
+        </div>
+
+        {/* Product Information */}
+        <div>
+          <p className="font-[family-name:var(--mono)] text-[9px] uppercase tracking-[0.12em] text-[var(--terra)] font-semibold mb-0.5 truncate">
+            {(product as any).subcategory
+              ? `${product.category} · ${(product as any).subcategory}`
+              : product.category}
+          </p>
+
+          <h3 className="m-0 font-[family-name:var(--serif)] text-[16px] font-normal leading-[1.25] text-[var(--ink)] group-hover:text-[var(--terra)] transition-colors line-clamp-1">
+            <Link href={`/products/${slug}`}>{product.name}</Link>
+          </h3>
+
+          <p className="line-clamp-1 mt-0.5 mb-1.5 text-[11.5px] leading-relaxed text-[var(--muted)] font-[family-name:var(--sans)]">
+            {product.description}
+          </p>
+
+          <div className="flex items-center gap-1 mb-2 text-[10.5px] font-[family-name:var(--mono)] text-[#e0912d]">
+            <Star size={10} fill="currentColor" />
+            <span className="font-medium">4.9</span>
+            <span className="text-[var(--muted)] text-[9.5px]">(Verified)</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Card Footer: Price & Add to Bag */}
+      <div className="pt-2 border-t border-[rgba(28,38,34,0.06)] flex items-center justify-between gap-2">
+        <div className="shrink-0 flex items-baseline gap-1.5">
+          <strong className="font-[family-name:var(--mono)] text-[13px] font-semibold text-[var(--ink)]">
+            {formatPrice(product.price)}
+          </strong>
+          {hasDiscount && (
+            <del className="font-[family-name:var(--mono)] text-[10.5px] text-[var(--muted)]">
+              {formatPrice(compareAt)}
+            </del>
+          )}
+        </div>
+
         <button
-          className={`
-            quick-add [position:absolute] [left:15px] [right:15px] [bottom:15px] [z-index:2] [height:43px]
-            [display:flex] [align-items:center] [justify-content:space-between] [padding:0_15px] [opacity:0]
-            [transform:translateY(8px)] [color:var(--paper)] [background:var(--ink)] [font:10px_var(--mono)]
-            [text-transform:uppercase] [transition:opacity_.3s_ease,_transform_.3s_ease]
-            [&:focus]:[opacity:1] [&:focus]:[transform:translateY(0)] max-[960px]:[opacity:1]
-            max-[960px]:[transform:none] max-[960px]:[left:8px] max-[960px]:[right:8px]
-            max-[960px]:[bottom:8px] max-[960px]:[height:36px] max-[960px]:[font-size:8px]
-          `}
-          onClick={onAdd}
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onAdd();
+          }}
+          disabled={!inStock}
+          className="inline-flex items-center justify-center gap-1 py-1.5 px-2.5 rounded-lg bg-[var(--ink)] text-[var(--paper)] font-[family-name:var(--mono)] text-[9.5px] uppercase tracking-wider transition-all duration-200 hover:bg-[var(--terra)] hover:shadow-xs active:scale-95 disabled:opacity-40 disabled:pointer-events-none"
         >
-          Add to bag <Plus size={15} />
+          <Plus size={12} strokeWidth={2.2} />
+          <span>Add</span>
         </button>
       </div>
-      <div
-        className={`
-        [display:flex] [justify-content:space-between] [align-items:start] [margin-top:19px]
-        [&_h3]:[margin:0] [&_h3]:[font:400_17px_var(--serif)] [&_strong]:[font:11px_var(--mono)]
-        [&_strong]:[white-space:nowrap] max-[960px]:[display:block]
-        max-[960px]:[&_strong]:[display:block] max-[960px]:[&_strong]:[margin-top:10px]
-        max-[960px]:[&_h3]:[font-size:15px]
-      `}
-      >
-        <div>
-          <p className="product-category [margin:0_0_8px] [font:9px_var(--mono)] [color:var(--muted)] [letter-spacing:.1em] [text-transform:uppercase]">
-            {product.category}
-          </p>
-          <h3>{product.name}</h3>
-        </div>
-        <strong>{formatPrice(product.price)}</strong>
-      </div>
-      <p className="[margin:8px_0_0] [color:var(--muted)] [font-size:12px] max-[960px]:[font-size:11px]">
-        {product.description}
-      </p>
     </article>
   );
 }
