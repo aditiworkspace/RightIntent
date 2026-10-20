@@ -30,12 +30,12 @@ const editions = [
 
 export function IntelligentTraderShowcase() {
   return (
-    <section className={styles.section} id="intelligent-trader" aria-labelledby="intelligent-trader-title">
+    <section className={`${styles.section} scroll-reveal`} id="intelligent-trader" aria-labelledby="intelligent-trader-title">
       <div className={styles.inner}>
         <div className={styles.heading}>
           <div>
             <p className={styles.eyebrow}>Right Intent × Intelligent Trader</p>
-            <h2 id="intelligent-trader-title" className="[margin:0] [font:400_clamp(37px,_4vw,_60px)/1.06_var(--serif)] [letter-spacing:-.055em]">Trade with a plan.<br /><em className="[color:var(--terra)] [font-style:italic]">Learn from every move.</em></h2>
+            <h2 id="intelligent-trader-title" className="[margin:0] [font:400_clamp(28px,_3.2vw,_44px)/1.06_var(--serif)] [letter-spacing:-.045em]">Trade with a plan.<br /><em className="[color:var(--terra)] [font-style:italic]">Learn from every move.</em></h2>
             <p className={styles.intro}>A trading journal collection made with Intelligent Trader, designed to help you slow down, review your decisions, and grow with every session.</p>
           </div>
           <div className={styles.collabMark}>

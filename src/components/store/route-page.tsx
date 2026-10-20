@@ -40,7 +40,7 @@ export function RoutePage({
 
 export function RouteNav() {
   return (
-    <div className="sticky top-0 z-50 backdrop-blur-md bg-[rgba(244,240,233,0.95)] border-b border-[var(--line)]">
+    <div className="sticky top-0 z-50 backdrop-blur-md max-[960px]:[backdrop-filter:none] bg-[rgba(244,240,233,0.95)] border-b border-[var(--line)]">
       <div className="h-[32px] flex items-center justify-center bg-[var(--ink)] text-[var(--paper)] font-[family-name:var(--mono)] text-[10px] tracking-[0.06em] uppercase px-4 text-center">
         <span>Free 2027 calendar + intentions card on every order · Complimentary shipping over Rs. 999</span>
       </div>

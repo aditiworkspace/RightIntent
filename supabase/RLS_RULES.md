@@ -9,6 +9,7 @@ These rules apply to every future Supabase table, storage bucket, view, or RPC t
 5. Never rely on frontend route hiding as authorization.
 6. Review policies with the Supabase MCP before applying a migration.
 7. Do not use the service-role key in browser code; it bypasses RLS.
+8. Multi-row write RPCs must use `SECURITY INVOKER`, verify the server-controlled role, revoke execution from `PUBLIC` and `anon`, and grant only the required roles. Keep table RLS as the final data-access boundary.
 
 ## Table template
 

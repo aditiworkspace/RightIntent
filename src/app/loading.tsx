@@ -1,3 +1,5 @@
+import { LuxuryLoader } from "@/components/store/luxury-loader";
+
 export default function Loading() {
-  return <main className="[min-height:80vh] [padding:15vh_8vw] [background:var(--paper)]" aria-label="Loading"><div className="[background:var(--cream)] [animation:pulse_1.4s_ease-in-out_infinite] [width:min(520px,_80%)] [height:300px]" /><div className="[background:var(--cream)] [animation:pulse_1.4s_ease-in-out_infinite] [width:300px] [height:22px] [margin-top:25px] [&.short]:[width:190px] [&.short]:[margin-top:12px]" /><div className="short [background:var(--cream)] [animation:pulse_1.4s_ease-in-out_infinite] [width:300px] [height:22px] [margin-top:25px] [&.short]:[width:190px] [&.short]:[margin-top:12px]" /></main>;
+  return <LuxuryLoader isFullPage={true} />;
 }

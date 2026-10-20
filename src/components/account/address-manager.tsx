@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { LoaderCircle, Plus, Trash2, MapPin, Check } from "lucide-react";
+import { LoaderCircle, Plus, Trash2 } from "lucide-react";
 
 type Address = {
   _id: string;

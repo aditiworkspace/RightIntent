@@ -1,84 +1,153 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles, Star, Eye, Heart } from "lucide-react";
 import { AddToCartButton } from "@/components/store/add-to-cart-button";
 
 export function ProductTile({
   product,
+  onQuickView,
 }: {
   product: {
     id: string;
     slug?: string;
     name: string;
     category: string;
+    subcategory?: string;
     price: number;
     compareAt?: number;
     image: string;
     description: string;
     stock?: number;
   };
+  onQuickView?: (product: any) => void;
 }) {
+  const [isWishlisted, setIsWishlisted] = useState(false);
   const slug = product.slug ?? product.name.toLowerCase().replaceAll(" ", "-");
   const inStock = product.stock === undefined || product.stock > 0;
 
-  return (
-    <article className="group relative flex flex-col justify-between bg-white/70 border border-[var(--line)] rounded-xl p-4 sm:p-5 transition-all duration-300 hover:shadow-xl hover:shadow-[rgba(28,38,34,0.06)] hover:border-[rgba(187,98,73,0.35)] hover:-translate-y-1">
-      <div>
-        <Link
-          href={`/products/${slug}`}
-          className="relative block aspect-[1/1.1] w-full overflow-hidden rounded-lg bg-[var(--cream)] mb-4"
-          aria-label={product.name}
-        >
-          {product.image && (
-            <Image
-              src={product.image}
-              alt={product.name}
-              fill
-              unoptimized
-              sizes="(max-width: 960px) 50vw, 33vw"
-              className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-            />
-          )}
+  const hasDiscount = product.compareAt && product.compareAt > product.price;
+  const discountPercent = hasDiscount
+    ? Math.round(((product.compareAt! - product.price) / product.compareAt!) * 100)
+    : 0;
 
-          {/* Badges */}
-          <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10">
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[rgba(244,240,233,0.92)] backdrop-blur-sm border border-[rgba(28,38,34,0.12)] font-[family-name:var(--mono)] text-[9px] uppercase tracking-wider text-[var(--ink)]">
-              <Sparkles size={10} className="text-[var(--terra)]" />
+  return (
+    <article className="group relative flex flex-col justify-between bg-white rounded-2xl border border-[rgba(28,38,34,0.08)] p-3 sm:p-4 transition-all duration-400 ease-out hover:shadow-[0_20px_35px_-8px_rgba(28,38,34,0.12)] hover:border-[rgba(187,98,73,0.35)] hover:-translate-y-1.5">
+      <div>
+        {/* Image Showcase Container with Studio Depth & Sunlight Sheen */}
+        <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl bg-gradient-to-b from-[#faf8f4] via-[#f5f1e8] to-[#ede7dc] border border-[rgba(28,38,34,0.05)] mb-3 group/img flex items-center justify-center p-3 sm:p-4">
+          {/* Subtle Sunlight Sheen Effect across the cover on hover */}
+          <div className="sheen-effect" />
+
+          <Link
+            href={`/products/${slug}`}
+            className="absolute inset-0 z-0 flex items-center justify-center"
+            aria-label={product.name}
+          >
+            {product.image && (
+              <Image
+                src={product.image}
+                alt={product.name}
+                fill
+                unoptimized
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                className="object-contain p-3 sm:p-4 transition-all duration-500 ease-out group-hover:scale-106 group-hover:-translate-y-1 drop-shadow-[0_10px_18px_rgba(28,38,34,0.12)] group-hover:drop-shadow-[0_16px_26px_rgba(28,38,34,0.18)]"
+              />
+            )}
+          </Link>
+
+          {/* Badges on Image (Top-Left) */}
+          <div className="absolute top-2.5 left-2.5 flex flex-wrap gap-1 z-10 pointer-events-none">
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white/90 backdrop-blur-md border border-[rgba(28,38,34,0.08)] font-[family-name:var(--mono)] text-[9px] uppercase tracking-wider text-[var(--ink)] shadow-xs">
+              <Sparkles size={9} className="text-[var(--terra)]" />
               {product.category}
             </span>
+            {hasDiscount && (
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-[#eaf4eb] text-[#2d6833] border border-[#cbe6cd] font-[family-name:var(--mono)] text-[9px] font-semibold tracking-wider uppercase shadow-xs">
+                Save {discountPercent}%
+              </span>
+            )}
           </div>
 
+          {/* Wishlist Heart Button (Top-Right) */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsWishlisted(!isWishlisted);
+            }}
+            className={`absolute top-2.5 right-2.5 z-20 w-7 h-7 rounded-full flex items-center justify-center backdrop-blur-md border transition-all duration-300 ${
+              isWishlisted
+                ? "bg-white text-[var(--terra)] border-[var(--terra)] shadow-xs animate-heart-pop"
+                : "bg-white/80 text-[var(--muted)] border-[rgba(28,38,34,0.08)] hover:text-[var(--ink)] hover:bg-white"
+            }`}
+            aria-label="Wishlist"
+          >
+            <Heart size={13} fill={isWishlisted ? "currentColor" : "none"} />
+          </button>
+
+          {/* Quick View Button on Hover */}
+          {onQuickView && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onQuickView(product);
+              }}
+              className="absolute bottom-2.5 inset-x-4 z-20 hidden sm:flex items-center justify-center gap-1.5 py-2 rounded-xl bg-white/95 backdrop-blur-md border border-[rgba(28,38,34,0.1)] text-[var(--ink)] font-[family-name:var(--mono)] text-[10px] uppercase tracking-wider font-medium shadow-md opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 hover:bg-[var(--ink)] hover:text-white"
+            >
+              <Eye size={12} /> Quick View
+            </button>
+          )}
+
           {!inStock && (
-            <div className="absolute inset-x-3 bottom-3 py-2 text-center rounded bg-[rgba(28,38,34,0.85)] text-[var(--paper)] font-[family-name:var(--mono)] text-[10px] tracking-wider uppercase backdrop-blur-sm">
+            <div className="absolute inset-x-2.5 bottom-2.5 py-1.5 text-center rounded-lg bg-[rgba(28,38,34,0.85)] text-[var(--paper)] font-[family-name:var(--mono)] text-[9px] tracking-wider uppercase backdrop-blur-sm z-10 pointer-events-none">
               Out of stock
             </div>
           )}
-        </Link>
+        </div>
 
+        {/* Product Meta */}
         <div>
-          <p className="font-[family-name:var(--mono)] text-[9px] uppercase tracking-[0.12em] text-[var(--muted)] mb-1.5">
-            Right Intent · Edition
+          <p className="font-[family-name:var(--mono)] text-[9px] uppercase tracking-[0.14em] text-[var(--terra)] font-semibold mb-1 truncate">
+            {product.subcategory
+              ? `${product.category} · ${product.subcategory}`
+              : product.category}
           </p>
-          <h2 className="m-0 font-[family-name:var(--serif)] text-[20px] sm:text-[22px] font-normal leading-[1.2] tracking-[-0.02em] text-[var(--ink)] group-hover:text-[var(--terra)] transition-colors">
+
+          <h2 className="m-0 font-[family-name:var(--serif)] text-[16px] sm:text-[17px] font-normal leading-[1.25] tracking-[-0.01em] text-[var(--ink)] group-hover:text-[var(--terra)] transition-colors line-clamp-1">
             <Link href={`/products/${slug}`}>{product.name}</Link>
           </h2>
-          <p className="line-clamp-2 mt-2 mb-3 text-[13px] leading-relaxed text-[var(--muted)]">
+
+          <p className="line-clamp-1 mt-1 mb-2 text-[12px] leading-relaxed text-[var(--muted)] font-[family-name:var(--sans)]">
             {product.description}
           </p>
+
+          <div className="flex items-center gap-1 mb-3 text-[11px] font-[family-name:var(--mono)] text-[#e0912d]">
+            <Star size={11} fill="currentColor" />
+            <span className="font-medium">4.9</span>
+            <span className="text-[var(--muted)] text-[10px]">(Verified)</span>
+          </div>
         </div>
       </div>
 
-      <div className="pt-3 border-t border-[rgba(28,38,34,0.08)] flex items-center justify-between gap-3">
-        <div>
-          <span className="block font-[family-name:var(--mono)] text-[13px] font-medium text-[var(--ink)]">
+      {/* Card Footer: Price & Add to Bag */}
+      <div className="pt-2.5 border-t border-[rgba(28,38,34,0.06)] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div className="shrink-0">
+          <span className="block font-[family-name:var(--mono)] text-[14px] font-semibold text-[var(--ink)] leading-none">
             Rs. {product.price.toLocaleString("en-IN")}
           </span>
-          {product.compareAt && product.compareAt > product.price && (
-            <del className="block font-[family-name:var(--mono)] text-[11px] text-[var(--muted)]">
-              Rs. {product.compareAt.toLocaleString("en-IN")}
+          {hasDiscount && (
+            <del className="block font-[family-name:var(--mono)] text-[10px] text-[var(--muted)] mt-0.5">
+              Rs. {product.compareAt!.toLocaleString("en-IN")}
             </del>
           )}
         </div>
+
         <AddToCartButton
           product={{
             slug,
@@ -87,7 +156,7 @@ export function ProductTile({
             image: product.image,
             stock: product.stock,
           }}
-          className="editorial-btn editorial-btn-primary min-h-[40px] px-3 text-[10px] py-1"
+          className="editorial-btn editorial-btn-primary w-full sm:w-auto min-h-[36px] px-3 text-[9px] py-1 rounded-lg"
         />
       </div>
     </article>

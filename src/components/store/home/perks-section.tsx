@@ -1,35 +1,49 @@
 export function PerksSection() {
   return (
-<section
-        className={`
-        [display:grid] [grid-template-columns:repeat(3,_1fr)] [gap:50px] [padding:100px_10vw]
-        [border-bottom:1px_solid_var(--line)] [&_strong]:[display:block]
-        [&_strong]:[font:21px_var(--serif)] [&_p]:[max-width:220px] [&_p]:[margin:10px_0_0]
-        [&_p]:[color:var(--muted)] [&_p]:[font-size:12px] [&_p]:[line-height:1.6]
-        max-[960px]:[grid-template-columns:1fr] max-[960px]:[gap:38px] max-[960px]:[padding:75px_24px]
-      `}
-      >
-        <div>
-          <span className="[display:block] [margin-bottom:37px] [font:10px_var(--mono)] [color:var(--terra)] max-[960px]:[margin-bottom:15px]">
+    <section className="py-8 sm:py-10 px-4 sm:px-[6vw] border-b border-[var(--line)] bg-[#faf8f4] scroll-reveal">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto">
+        <div className="flex items-start gap-4">
+          <span className="font-[family-name:var(--mono)] text-[12px] font-semibold text-[var(--terra)] shrink-0 pt-0.5">
             01
           </span>
-          <strong>Made with intention</strong>
-          <p>Small batches, considered materials, no shortcuts.</p>
+          <div>
+            <strong className="block font-[family-name:var(--serif)] text-[18px] text-[var(--ink)] font-normal leading-snug">
+              Made with intention
+            </strong>
+            <p className="mt-1 m-0 text-[12px] text-[var(--muted)] leading-relaxed font-[family-name:var(--sans)]">
+              Small batches, considered materials, and honest Indian craftsmanship.
+            </p>
+          </div>
         </div>
-        <div>
-          <span className="[display:block] [margin-bottom:37px] [font:10px_var(--mono)] [color:var(--terra)] max-[960px]:[margin-bottom:15px]">
+
+        <div className="flex items-start gap-4">
+          <span className="font-[family-name:var(--mono)] text-[12px] font-semibold text-[var(--terra)] shrink-0 pt-0.5">
             02
           </span>
-          <strong>Easy, always</strong>
-          <p>Free shipping over Rs. 2,000 and simple returns.</p>
+          <div>
+            <strong className="block font-[family-name:var(--serif)] text-[18px] text-[var(--ink)] font-normal leading-snug">
+              Easy & reliable delivery
+            </strong>
+            <p className="mt-1 m-0 text-[12px] text-[var(--muted)] leading-relaxed font-[family-name:var(--sans)]">
+              Free shipping across India on orders over Rs. 999. Seamless returns.
+            </p>
+          </div>
         </div>
-        <div>
-          <span className="[display:block] [margin-bottom:37px] [font:10px_var(--mono)] [color:var(--terra)] max-[960px]:[margin-bottom:15px]">
+
+        <div className="flex items-start gap-4">
+          <span className="font-[family-name:var(--mono)] text-[12px] font-semibold text-[var(--terra)] shrink-0 pt-0.5">
             03
           </span>
-          <strong>Here to help</strong>
-          <p>Real people, thoughtful answers. hello@rightintent.world</p>
+          <div>
+            <strong className="block font-[family-name:var(--serif)] text-[18px] text-[var(--ink)] font-normal leading-snug">
+              Here to help
+            </strong>
+            <p className="mt-1 m-0 text-[12px] text-[var(--muted)] leading-relaxed font-[family-name:var(--sans)]">
+              Real makers, thoughtful answers. Write to us at hello@rightintent.world
+            </p>
+          </div>
         </div>
-      </section>
+      </div>
+    </section>
   );
 }

@@ -1,61 +1,30 @@
-import { RouteNav, RoutePage } from "@/components/store/route-page";
-import { ProductTile } from "@/components/store/product-tile";
+import { Suspense } from "react";
+import { RouteNav } from "@/components/store/route-page";
+import { CatalogBrowser } from "@/components/store/catalog-browser";
 import { getCatalogProducts } from "@/lib/catalog";
-import { SlidersHorizontal, ArrowUpDown } from "lucide-react";
-import Link from "next/link";
+import { PageLoading } from "@/components/store/page-loading";
 
 export const metadata = {
   title: "Shop Journals, Planners & Thoughtful Tools | Right Intent",
   description: "Explore journals, planners and thoughtful everyday tools from Right Intent.",
 };
 
-export default async function ProductsPage() {
+type ProductsPageProps = {
+  searchParams: Promise<{ category?: string; sort?: string }>;
+};
+
+export default async function ProductsPage({ searchParams }: ProductsPageProps) {
+  const { category } = await searchParams;
   const products = await getCatalogProducts();
-  const categories = Array.from(new Set(products.map((p) => p.category)));
 
   return (
     <>
       <RouteNav />
-      <RoutePage
-        eyebrow="The Full Edit"
-        title="Tools for intentional living."
-        description="A considered collection of physical journals, structured planners, and thoughtful artifacts designed for deep focus and personal growth."
-      >
-        {/* Category Pills & Filter Bar */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 py-4 mb-8 border-y border-[var(--line)]">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="editorial-chip active">All ({products.length})</span>
-            {categories.map((cat) => (
-              <Link
-                key={cat}
-                href={`/category/${cat.toLowerCase()}`}
-                className="editorial-chip hover:bg-[var(--ink)] hover:text-[var(--paper)]"
-              >
-                {cat}
-              </Link>
-            ))}
-          </div>
-
-          <div className="flex items-center gap-4 text-[11px] font-[family-name:var(--mono)] text-[var(--muted)]">
-            <span className="hidden sm:inline">Showing all {products.length} pieces</span>
-            <div className="flex items-center gap-2">
-              <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-[var(--line)] hover:border-[var(--ink)] text-[var(--ink)] transition-colors">
-                <SlidersHorizontal size={13} /> Filter
-              </button>
-              <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-[var(--line)] hover:border-[var(--ink)] text-[var(--ink)] transition-colors">
-                <ArrowUpDown size={13} /> Sort: Featured
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Product Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          {products.map((product) => (
-            <ProductTile key={product.id} product={product} />
-          ))}
-        </div>
-      </RoutePage>
+      <main className="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 pt-5 sm:pt-6 pb-20 animate-hero-glide">
+        <Suspense fallback={<PageLoading />}>
+          <CatalogBrowser products={products} initialCategory={category} />
+        </Suspense>
+      </main>
     </>
   );
 }

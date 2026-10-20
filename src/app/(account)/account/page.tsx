@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/lib/auth/profile";
+import { getCurrentAdminAccess } from "@/lib/auth/admin";
 import { RouteNav, RoutePage } from "@/components/store/route-page";
 import { PageLoading } from "@/components/store/page-loading";
 import {
@@ -11,9 +12,7 @@ import {
   Heart,
   ArrowRight,
   Sparkles,
-  LogOut,
 } from "lucide-react";
-import { AuthButton } from "@/components/store/auth-button";
 import { LogoutButton } from "@/components/account/logout-button";
 
 export default function AccountPage() {
@@ -27,8 +26,20 @@ export default function AccountPage() {
 async function AccountContent() {
   const { user, profile } = await getCurrentProfile();
   if (!user) redirect("/login?next=/account");
+  const adminAccess = await getCurrentAdminAccess();
 
   const links = [
+    ...(adminAccess?.isAdmin
+      ? [
+          {
+            title: "Studio Admin",
+            description: "Manage products, inventory, orders, and studio settings.",
+            href: "/admin",
+            icon: Sparkles,
+            badge: "Admin",
+          },
+        ]
+      : []),
     {
       title: "Order History",
       description: "Track current dispatches and review previous purchases.",

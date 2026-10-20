@@ -43,21 +43,95 @@ export const POST = withApiPerformance("/api/checkout/create-order", async (requ
     ]);
     let products = initialProducts;
 
-    // Local catalog data keeps the demo checkout usable before the MongoDB seed is run.
-    if (process.env.NODE_ENV !== "production" && products.length !== requestedItems.length) {
+    // Sync from Supabase catalog if any requested products are missing in MongoDB
+    if (products.length !== requestedItems.length) {
       const liveSlugs = new Set(products.map((product) => product.slug));
-      const missingSamples = sampleProducts.filter((product) => requestedSlugs.includes(product.name.toLowerCase().replaceAll(" ", "-")) && !liveSlugs.has(product.name.toLowerCase().replaceAll(" ", "-")));
-      if (missingSamples.length) {
-        await measureDatabaseQuery(metrics, () => ProductModel.bulkWrite(missingSamples.map((product) => ({
-          updateOne: {
-            filter: { slug: product.name.toLowerCase().replaceAll(" ", "-") },
-            update: { $set: { name: product.name, slug: product.name.toLowerCase().replaceAll(" ", "-"), category: product.category, description: product.description, priceInr: product.price, compareAtPriceInr: product.compareAt, sku: `AD-${product.id}`, images: [{ path: product.image, alt: product.name, sortOrder: 0 }], isPublished: true, stock: 25 } },
-            upsert: true,
-          },
-        }))));
-        products = await measureDatabaseQuery(metrics, () => ProductModel.find({ slug: { $in: requestedSlugs }, isPublished: true }).lean());
+      const missingSlugs = requestedSlugs.filter((slug) => !liveSlugs.has(slug));
+
+      if (missingSlugs.length > 0) {
+        const { data: supabaseProducts } = await supabase
+          .from("products")
+          .select("id, name, slug, price_inr, sale_price_inr, compare_at_price_inr, sku, description, subcategory, stock, images, is_published")
+          .in("slug", missingSlugs)
+          .eq("is_published", true);
+
+        if (supabaseProducts && supabaseProducts.length > 0) {
+          await measureDatabaseQuery(metrics, () =>
+            ProductModel.bulkWrite(
+              supabaseProducts.map((p) => ({
+                updateOne: {
+                  filter: { slug: p.slug },
+                  update: {
+                    $set: {
+                      name: p.name,
+                      slug: p.slug,
+                      category: p.subcategory || "Objects",
+                      description: p.description || p.name,
+                      priceInr: p.sale_price_inr ?? p.price_inr,
+                      compareAtPriceInr: p.compare_at_price_inr ?? undefined,
+                      sku: p.sku || `SP-${p.slug}`,
+                      images: Array.isArray(p.images)
+                        ? p.images.map((img: unknown, idx: number) => ({
+                            path: typeof img === "string" ? img : ((img as Record<string, unknown>)?.storage_path || (img as Record<string, unknown>)?.path || (img as Record<string, unknown>)?.url || ""),
+                            alt: p.name,
+                            sortOrder: idx,
+                          }))
+                        : [],
+                      isPublished: true,
+                      stock: typeof p.stock === "number" ? p.stock : 25,
+                    },
+                  },
+                  upsert: true,
+                },
+              }))
+            )
+          );
+          products = await measureDatabaseQuery(metrics, () =>
+            ProductModel.find({ slug: { $in: requestedSlugs }, isPublished: true }).lean()
+          );
+        }
+      }
+
+      // Also fallback to sampleProducts for local demo fixtures
+      if (products.length !== requestedItems.length) {
+        const currentSlugs = new Set(products.map((product) => product.slug));
+        const missingSamples = sampleProducts.filter(
+          (product) =>
+            requestedSlugs.includes(product.name.toLowerCase().replaceAll(" ", "-")) &&
+            !currentSlugs.has(product.name.toLowerCase().replaceAll(" ", "-"))
+        );
+        if (missingSamples.length) {
+          await measureDatabaseQuery(metrics, () =>
+            ProductModel.bulkWrite(
+              missingSamples.map((product) => ({
+                updateOne: {
+                  filter: { slug: product.name.toLowerCase().replaceAll(" ", "-") },
+                  update: {
+                    $set: {
+                      name: product.name,
+                      slug: product.name.toLowerCase().replaceAll(" ", "-"),
+                      category: product.category,
+                      description: product.description,
+                      priceInr: product.price,
+                      compareAtPriceInr: product.compareAt,
+                      sku: `AD-${product.id}`,
+                      images: [{ path: product.image, alt: product.name, sortOrder: 0 }],
+                      isPublished: true,
+                      stock: 25,
+                    },
+                  },
+                  upsert: true,
+                },
+              }))
+            )
+          );
+          products = await measureDatabaseQuery(metrics, () =>
+            ProductModel.find({ slug: { $in: requestedSlugs }, isPublished: true }).lean()
+          );
+        }
       }
     }
+
     if (products.length !== requestedItems.length) return NextResponse.json({ error: "One or more products are unavailable." }, { status: 400 });
 
     const productBySlug = new Map(products.map((product) => [product.slug, product]));

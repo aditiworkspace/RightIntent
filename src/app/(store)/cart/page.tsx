@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
   ArrowRight,
   Minus,
@@ -11,18 +11,17 @@ import {
   Trash2,
   ShieldCheck,
   Truck,
-  Sparkles,
-  ArrowLeft,
+  ArrowLeft
 } from "lucide-react";
 import { RouteNav, RoutePage } from "@/components/store/route-page";
 import { useCartStore } from "@/lib/cart-store";
+import { useMounted } from "@/lib/use-mounted";
 
 export default function CartPage() {
-  const [mounted, setMounted] = useState(false);
+  const mounted = useMounted();
 
   useEffect(() => {
     void useCartStore.persist.rehydrate();
-    setMounted(true);
   }, []);
 
   const items = useCartStore((state) => state.items);
@@ -111,13 +110,13 @@ export default function CartPage() {
                     className="p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-colors hover:bg-white/90"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="relative w-20 h-24 sm:w-24 sm:h-28 rounded-lg overflow-hidden bg-[var(--cream)] shrink-0 border border-[rgba(28,38,34,0.06)]">
+                      <div className="relative w-20 h-24 sm:w-24 sm:h-28 rounded-lg overflow-hidden bg-[var(--cream)]/60 shrink-0 border border-[rgba(28,38,34,0.06)]">
                         {item.image && (
                           <Image
                             src={item.image}
                             alt={item.name}
                             fill
-                            className="object-cover"
+                            className="object-contain p-1.5"
                           />
                         )}
                       </div>

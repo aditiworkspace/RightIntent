@@ -9,6 +9,8 @@ export type Product = {
   accent: string;
   badge?: string;
   stock?: number;
+  slug?: string;
+  subcategory?: string;
 };
 
 export const products: Product[] = [

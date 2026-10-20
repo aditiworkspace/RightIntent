@@ -1,39 +1,35 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, ArrowRight, LoaderCircle, ShieldCheck, Smartphone, Mail, RefreshCw } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import { BrandLogo } from "@/components/store/brand-logo";
 
+import { useMounted } from "@/lib/use-mounted";
+
 type LoginMode = "phone" | "email";
 type LoginStep = "identifier" | "otp" | "email-sent";
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
-  const [mounted, setMounted] = useState(false);
-  const [nextPath, setNextPath] = useState("/account");
+  const searchParams = useSearchParams();
+  const mounted = useMounted();
+
+  const nextParam = searchParams.get("next");
+  const nextPath =
+    nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//")
+      ? nextParam
+      : "/account";
+
+  const cbError = searchParams.get("error_description") || searchParams.get("error");
   const [mode, setMode] = useState<LoginMode>("phone");
   const [step, setStep] = useState<LoginStep>("identifier");
   const [identifier, setIdentifier] = useState("");
   const [otp, setOtp] = useState("");
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(cbError ? decodeURIComponent(cbError) : "");
   const [loading, setLoading] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
-
-  useEffect(() => {
-    setMounted(true);
-    const params = new URLSearchParams(window.location.search);
-    const next = params.get("next");
-    if (next && next.startsWith("/") && !next.startsWith("//")) {
-      setNextPath(next);
-    }
-    // Show any error forwarded back from the OAuth callback route.
-    const cbError = params.get("error_description") || params.get("error");
-    if (cbError) {
-      setMessage(decodeURIComponent(cbError));
-    }
-  }, []);
 
   const triggerCooldown = () => {
     setResendCooldown(30);
@@ -46,12 +42,6 @@ export default function LoginPage() {
         return prev - 1;
       });
     }, 1000);
-  };
-
-  const getCleanPhone = (val: string) => {
-    const raw = val.replace(/\D/g, "");
-    if (raw.startsWith("91") && raw.length === 12) return `+${raw}`;
-    return `+91${raw}`;
   };
 
   const sendCode = async (event?: React.FormEvent<HTMLFormElement>) => {
@@ -382,5 +372,13 @@ export default function LoginPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginContent />
+    </Suspense>
   );
 }

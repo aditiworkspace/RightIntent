@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { RouteNav, RoutePage } from "@/components/store/route-page";
 import { PageLoading } from "@/components/store/page-loading";
-import { ArrowLeft, Check, Clock, PackageCheck, Truck, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Check, ShieldCheck } from "lucide-react";
 
 type AccountOrderDetailProps = { params: Promise<{ id: string }> };
 

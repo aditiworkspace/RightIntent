@@ -4,53 +4,67 @@ import type { Product } from "@/lib/products";
 import { ArrowRight, Check, ShoppingBag, X } from "lucide-react";
 import { formatPrice } from "./format-price";
 
-type CartDrawerProps = { isOpen: boolean; cart: Product[]; onClose: () => void; onRemoveItem: (index: number) => void; onCheckout: () => void };
+type CartDrawerProps = {
+  isOpen: boolean;
+  cart: Product[];
+  onClose: () => void;
+  onRemoveItem: (index: number) => void;
+  onCheckout: () => void;
+};
 
-export function CartDrawer({ isOpen, cart, onClose, onRemoveItem, onCheckout }: CartDrawerProps) {
-  return <>
-    {isOpen && (
+export function CartDrawer({
+  isOpen,
+  cart,
+  onClose,
+  onRemoveItem,
+  onCheckout,
+}: CartDrawerProps) {
+  return (
+    <>
+      {isOpen && (
         <div
-          className="[position:fixed] [inset:0] [z-index:10] [background:rgba(13,_18,_15,_.48)] [animation:fade-in_.2s_ease]"
+          className="fixed inset-0 z-[90] bg-[rgba(13,18,15,0.52)] backdrop-blur-xs animate-fade-in"
           onClick={() => onClose()}
         >
           <aside
-            className="[position:absolute] [top:0] [right:0] [width:min(450px,_100%)] [height:100%] [padding:39px] [background:var(--paper)] [animation:slide-in_.3s_ease] max-[960px]:[padding:28px_22px]"
+            className="absolute top-0 right-0 w-[min(450px,100%)] h-full bg-[var(--paper)] shadow-2xl flex flex-col p-6 sm:p-8 animate-slide-in"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="[display:flex] [justify-content:space-between] [&_.eyebrow]:[margin-bottom:10px] [&_h2]:[font-size:30px] [&_h2_span]:[color:var(--muted)] [&_h2_span]:[font:12px_var(--mono)]">
+            {/* Header */}
+            <div className="flex items-center justify-between pb-4 border-b border-[var(--line)] shrink-0">
               <div>
-                <p className="eyebrow [margin:0_0_21px] [font:10px_var(--mono)] [letter-spacing:.14em] [text-transform:uppercase] [color:var(--muted)]">
-                  Your edit
+                <p className="eyebrow m-0 mb-1 font-[family-name:var(--mono)] text-[9.5px] uppercase tracking-[0.16em] text-[var(--muted)] font-medium">
+                  Your Edit
                 </p>
-                <h2 className="[margin:0] [font:400_clamp(37px,_4vw,_60px)/1.06_var(--serif)] [letter-spacing:-.055em]">
-                  Shopping bag <span>({cart.length})</span>
+                <h2 className="m-0 font-[family-name:var(--serif)] text-[26px] sm:text-[30px] font-normal tracking-[-0.03em] text-[var(--ink)]">
+                  Shopping bag <span className="font-[family-name:var(--mono)] text-[12px] text-[var(--muted)]">({cart.length})</span>
                 </h2>
               </div>
               <button
+                type="button"
                 aria-label="Close cart"
                 onClick={() => onClose()}
+                className="w-8 h-8 rounded-full border border-[var(--line)] flex items-center justify-center text-[var(--ink)] hover:bg-[var(--line)] transition-colors"
               >
-                <X size={21} />
+                <X size={18} />
               </button>
             </div>
+
+            {/* Cart Body */}
             {cart.length === 0 ? (
-              <div
-                className={`
-                [display:flex] [flex-direction:column] [align-items:center] [justify-content:center]
-                [height:60%] [text-align:center] [&_p]:[margin:21px_0_6px] [&_p]:[font:25px_var(--serif)]
-                [&_span]:[color:var(--muted)] [&_span]:[font-size:12px] [&_.button]:[margin-top:26px]
-              `}
-              >
-                <ShoppingBag size={30} />
-                <p>Your bag is waiting.</p>
-                <span>Add something lovely to get started.</span>
+              <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
+                <div className="w-14 h-14 rounded-full bg-[rgba(28,38,34,0.05)] flex items-center justify-center text-[var(--muted)] mb-4">
+                  <ShoppingBag size={24} />
+                </div>
+                <p className="m-0 font-[family-name:var(--serif)] text-[22px] text-[var(--ink)]">
+                  Your bag is waiting.
+                </p>
+                <span className="text-[12px] text-[var(--muted)] mt-1.5 mb-6 max-w-xs font-[family-name:var(--sans)]">
+                  Add something lovely to begin your ritual.
+                </span>
                 <button
-                  className={`
-                    button [min-height:46px] [display:inline-flex] [align-items:center] [justify-content:center]
-                    [gap:15px] [padding:0_21px] [font:10px_var(--mono)] [letter-spacing:.08em]
-                    [text-transform:uppercase] [transition:transform_.25s_ease,_background_.25s_ease]
-                    [&:hover]:[transform:translateY(-2px)] [color:var(--paper)] [background:var(--ink)]
-                  `}
+                  type="button"
+                  className="inline-flex min-h-[42px] items-center justify-center gap-2 px-6 rounded-xl font-[family-name:var(--mono)] text-[10px] uppercase tracking-wider bg-[var(--ink)] text-[var(--paper)] hover:bg-[var(--terra)] transition-all shadow-xs"
                   onClick={() => onClose()}
                 >
                   Keep exploring
@@ -58,63 +72,68 @@ export function CartDrawer({ isOpen, cart, onClose, onRemoveItem, onCheckout }: 
               </div>
             ) : (
               <>
-                <div className="[margin-top:50px] [border-top:1px_solid_var(--line)]">
+                {/* Scrollable Items List */}
+                <div className="flex-1 overflow-y-auto min-h-0 divide-y divide-[var(--line)] pr-1">
                   {cart.map((product, index) => (
                     <div
-                      className={`
-                        [display:grid] [grid-template-columns:62px_1fr_20px] [gap:15px] [align-items:center]
-                        [padding:17px_0] [border-bottom:1px_solid_var(--line)] [&_strong]:[display:block]
-                        [&_strong]:[font:15px_var(--serif)] [&_span]:[display:block] [&_span]:[margin:4px_0]
-                        [&_span]:[color:var(--muted)] [&_span]:[font:9px_var(--mono)]
-                        [&_span]:[text-transform:uppercase] [&_p]:[display:block] [&_p]:[margin:8px_0_0]
-                        [&_p]:[font:11px_var(--mono)]
-                      `}
+                      className="grid grid-cols-[56px_1fr_24px] sm:grid-cols-[64px_1fr_24px] gap-3.5 items-center py-4"
                       key={`${product.id}-${index}`}
                     >
                       <div
-                        className="[width:62px] [height:72px] [background-position:center] [background-size:cover]"
+                        className="w-14 h-16 sm:w-16 sm:h-18 rounded-lg bg-center bg-cover bg-[var(--cream)] border border-[rgba(28,38,34,0.06)] shrink-0"
                         style={{ backgroundImage: `url(${product.image})` }}
                       />
-                      <div>
-                        <strong>{product.name}</strong>
-                        <span>{product.category}</span>
-                        <p>{formatPrice(product.price)}</p>
+                      <div className="min-w-0">
+                        <strong className="block font-[family-name:var(--serif)] text-[15px] sm:text-[16px] font-normal text-[var(--ink)] truncate">
+                          {product.name}
+                        </strong>
+                        <span className="block font-[family-name:var(--mono)] text-[8.5px] uppercase tracking-wider text-[var(--muted)] mt-0.5">
+                          {product.category}
+                        </span>
+                        <p className="font-[family-name:var(--mono)] text-[12px] font-semibold text-[var(--ink)] mt-1 mb-0">
+                          {formatPrice(product.price)}
+                        </p>
                       </div>
                       <button
+                        type="button"
                         aria-label={`Remove ${product.name}`}
                         onClick={() => onRemoveItem(index)}
+                        className="text-[var(--muted)] hover:text-[var(--terra)] transition-colors p-1"
                       >
                         <X size={15} />
                       </button>
                     </div>
                   ))}
                 </div>
-                <div className="[display:flex] [justify-content:space-between] [margin:28px_0_20px] [font:12px_var(--mono)]">
-                  <span>Subtotal</span>
-                  <strong>
-                    {formatPrice(
-                      cart.reduce((sum, product) => sum + product.price, 0),
-                    )}
-                  </strong>
+
+                {/* Docked Footer (Always visible & reachable) */}
+                <div className="shrink-0 pt-4 border-t border-[var(--line)] pb-[calc(10px+env(safe-area-inset-bottom))] space-y-3">
+                  <div className="flex justify-between items-baseline font-[family-name:var(--mono)]">
+                    <span className="text-[11px] uppercase tracking-wider text-[var(--muted)]">Subtotal</span>
+                    <strong className="text-[17px] font-semibold text-[var(--ink)]">
+                      {formatPrice(
+                        cart.reduce((sum, product) => sum + product.price, 0),
+                      )}
+                    </strong>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="w-full min-h-[46px] rounded-xl font-[family-name:var(--mono)] text-[11px] uppercase tracking-wider font-semibold bg-[var(--ink)] text-[var(--paper)] hover:bg-[var(--terra)] active:scale-[0.99] transition-all flex items-center justify-center gap-2 shadow-xs"
+                    onClick={() => onCheckout()}
+                  >
+                    Continue to checkout <ArrowRight size={15} />
+                  </button>
+
+                  <p className="flex items-center justify-center gap-1.5 m-0 text-[10px] font-[family-name:var(--mono)] text-[var(--muted)] text-center">
+                    <Check size={13} className="text-[#346a3a]" /> Taxes and shipping calculated at checkout
+                  </p>
                 </div>
-                <button
-                  className={`
-                    button [min-height:46px] [display:inline-flex] [align-items:center] [justify-content:center]
-                    [gap:15px] [padding:0_21px] [font:10px_var(--mono)] [letter-spacing:.08em]
-                    [text-transform:uppercase] [transition:transform_.25s_ease,_background_.25s_ease]
-                    [&:hover]:[transform:translateY(-2px)] [color:var(--paper)] [background:var(--ink)] [width:100%]
-                  `}
-                  onClick={() => onCheckout()}
-                >
-                  Continue to checkout <ArrowRight size={16} />
-                </button>
-                <p className="[display:flex] [align-items:center] [justify-content:center] [gap:6px] [color:var(--muted)] [font:10px_var(--mono)]">
-                  <Check size={14} /> Taxes and shipping calculated at checkout
-                </p>
               </>
             )}
           </aside>
         </div>
       )}
-  </>;
+    </>
+  );
 }

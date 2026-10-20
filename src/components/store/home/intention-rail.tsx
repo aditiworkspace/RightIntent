@@ -1,92 +1,85 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
+const RITUALS = [
+  {
+    tag: "PLAN",
+    title: "Planners & to-do lists",
+    href: "/products?category=carry",
+    img: "https://images.unsplash.com/photo-1517842645767-c639042777db?auto=format&fit=crop&w=240&q=80",
+    bg: "#d8c6aa",
+  },
+  {
+    tag: "REFLECT",
+    title: "Journals & prompts",
+    href: "/products?category=trade",
+    img: "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=240&q=80",
+    bg: "#e0c9bf",
+  },
+  {
+    tag: "THE CHALLENGE",
+    title: "Intelligent Trader",
+    href: "#intelligent-trader",
+    img: "https://images.unsplash.com/photo-1531346878377-a5be20888e57?auto=format&fit=crop&w=240&q=80",
+    bg: "#2d302c",
+  },
+  {
+    tag: "BUILD",
+    title: "Habit trackers & kits",
+    href: "/products?category=textiles",
+    img: "https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?auto=format&fit=crop&w=240&q=80",
+    bg: "#d7c6a8",
+  },
+  {
+    tag: "GIFT",
+    title: "Curated gift sets",
+    href: "/products",
+    img: "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=240&q=80",
+    bg: "#b98e64",
+  },
+];
+
 export function IntentionRail() {
   return (
-<section
-        className={`
-          [display:grid] [grid-template-columns:repeat(5,_1fr)] [min-height:300px] [padding:14px_3.5vw]
-          [background:#f7ead8] [border-bottom:1px_solid_var(--line)] [&_a]:[display:grid]
-          [&_a]:[grid-template-columns:minmax(0,_1fr)_auto] [&_a]:[align-content:center]
-          [&_a]:[align-items:center] [&_a]:[gap:6px_12px] [&_a]:[padding:16px_26px]
-          [&_a]:[border-right:1px_solid_rgba(28,_38,_34,_.13)] [&_a:last-child]:[border-right:0]
-          [&_i]:[grid-column:1] [&_i]:[grid-row:1] [&_i]:[width:100px] [&_i]:[height:100px]
-          [&_i]:[border-radius:12px] [&_span]:[grid-column:1] [&_span]:[color:var(--terra)]
-          [&_span]:[font:9px_var(--mono)] [&_span]:[letter-spacing:.16em]
-          [&_strong]:[grid-column:1] [&_strong]:[font:400_17px/1.12_var(--serif)]
-          [&_svg]:[grid-column:2] [&_svg]:[grid-row:3] [&_svg]:[align-self:center] [&_svg]:[width:27px]
-          [&_svg]:[height:27px] [&_svg]:[padding:6px] [&_svg]:[border:1px_solid_rgba(28,_38,_34,_.3)]
-          [&_svg]:[border-radius:50%] max-[960px]:[grid-template-columns:repeat(2,_1fr)]
-          max-[960px]:[min-height:0] max-[960px]:[padding:10px_12px]
-          max-[960px]:[&_a]:[min-height:115px] max-[960px]:[&_a]:[padding:14px_12px]
-          max-[960px]:[&_a]:[grid-template-columns:62px_1fr_auto]
-          max-[960px]:[&_i]:[grid-column:1] max-[960px]:[&_i]:[grid-row:1_/_span_2]
-          max-[960px]:[&_i]:[width:62px] max-[960px]:[&_i]:[height:64px]
-          max-[960px]:[&_span]:[grid-column:2] max-[960px]:[&_strong]:[grid-column:2]
-          max-[960px]:[&_svg]:[grid-column:3] max-[960px]:[&_svg]:[grid-row:1_/_span_2]
-          max-[960px]:[&_a:nth-child(2n)]:[border-right:0] max-[960px]:[&_strong]:[font-size:15px]
-          [&_.rail-thumb]:[border-radius:11px] [&_.rail-thumb]:[background-position:center]
-          [&_.rail-thumb]:[background-size:cover]
-          [&_.rail-thumb]:[box-shadow:0_6px_12px_rgba(42,_35,_25,_.12)]
-          max-[960px]:[display:flex] max-[960px]:[overflow-x:auto] max-[960px]:[scroll-snap-type:x_mandatory]
-          max-[960px]:[overscroll-behavior-x:contain] max-[960px]:[scrollbar-width:none]
-          max-[960px]:[padding:10px_14px] max-[960px]:[gap:8px]
-          max-[960px]:[&::-webkit-scrollbar]:[display:none]
-          max-[960px]:[&_a]:[width:248px] max-[960px]:[&_a]:[min-width:248px]
-          max-[960px]:[&_a]:[min-height:92px] max-[960px]:[&_a]:[scroll-snap-align:start]
-          max-[960px]:[&_a]:[border-right:1px_solid_rgba(28,_38,_34,_.13)]
-          max-[960px]:[&_a:last-child]:[border-right:0]
-          max-[960px]:[&_i]:[width:58px] max-[960px]:[&_i]:[height:58px]
-          max-[960px]:[&_strong]:[font-size:14px]
-        `}
-        aria-label="Shop by intention"
-      >
-        <Link href="/category/objects">
-          <i className="rail-thumb [background-image:url('https://images.unsplash.com/photo-1517842645767-c639042777db?auto=format&fit=crop&w=240&q=80')] [background-color:#d8c6aa]" />
-          <span>PLAN</span>
-          <strong>
-            Planners &<br />
-            to-do lists
-          </strong>
-          <ArrowRight size={15} />
-        </Link>
-        <Link href="/category/objects">
-          <i className="rail-thumb [background-image:url('https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=240&q=80')] [background-color:#e0c9bf]" />
-          <span>REFLECT</span>
-          <strong>
-            Journals &<br />
-            guided prompts
-          </strong>
-          <ArrowRight size={15} />
-        </Link>
-        <Link href="/category/objects">
-          <i className="rail-thumb [background-image:url('https://images.unsplash.com/photo-1531346878377-a5be20888e57?auto=format&fit=crop&w=240&q=80')] [background-color:#2d302c]" />
-          <span>THE CHALLENGE</span>
-          <strong>
-            Intelligent Trader
-            <br />
-            100-day journal
-          </strong>
-          <ArrowRight size={15} />
-        </Link>
-        <Link href="/category/objects">
-          <i className="rail-thumb [background-image:url('https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?auto=format&fit=crop&w=240&q=80')] [background-color:#d7c6a8]" />
-          <span>BUILD</span>
-          <strong>
-            Habit trackers
-            <br />& challenge kits
-          </strong>
-          <ArrowRight size={15} />
-        </Link>
-        <Link href="/products">
-          <i className="rail-thumb [background-image:url('https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=240&q=80')] [background-color:#b98e64]" />
-          <span>GIFT</span>
-          <strong>
-            New year &<br />
-            curated boxes
-          </strong>
-          <ArrowRight size={15} />
-        </Link>
-      </section>
+    <section
+      className="scroll-reveal bg-[#f7ead8] border-b border-[var(--line)] py-3 px-4 sm:px-[4vw]"
+      aria-label="Shop by intention"
+    >
+      <div className="flex overflow-x-auto snap-x snap-mandatory scrollbar-none gap-2.5 sm:grid sm:grid-cols-3 lg:grid-cols-5 sm:overflow-visible sm:gap-3 pb-1 sm:pb-0">
+        {RITUALS.map((ritual, idx) => (
+          <Link
+            key={ritual.tag}
+            href={ritual.href}
+            className={`group relative flex items-center gap-3 p-2.5 rounded-xl transition-all duration-300 hover:bg-white/60 hover:shadow-xs hover:-translate-y-0.5 ${
+              idx < RITUALS.length - 1 ? "lg:border-r lg:border-[rgba(28,38,34,0.12)] pr-4" : ""
+            }`}
+          >
+            {/* Thumbnail */}
+            <div
+              className="w-12 h-12 rounded-lg bg-cover bg-center shrink-0 shadow-xs transition-transform duration-300 group-hover:scale-105"
+              style={{
+                backgroundImage: `url('${ritual.img}')`,
+                backgroundColor: ritual.bg,
+              }}
+            />
+
+            {/* Details */}
+            <div className="min-w-0 flex-1">
+              <span className="block font-[family-name:var(--mono)] text-[8.5px] uppercase tracking-[0.16em] text-[var(--terra)] font-semibold mb-0.5">
+                {ritual.tag}
+              </span>
+              <strong className="block font-[family-name:var(--serif)] text-[14px] leading-tight text-[var(--ink)] font-normal group-hover:text-[var(--terra)] transition-colors truncate">
+                {ritual.title}
+              </strong>
+            </div>
+
+            {/* Arrow Icon */}
+            <div className="w-6 h-6 rounded-full border border-[rgba(28,38,34,0.25)] flex items-center justify-center shrink-0 text-[var(--ink)] opacity-60 group-hover:opacity-100 group-hover:border-[var(--terra)] group-hover:text-[var(--terra)] transition-all">
+              <ArrowRight size={12} />
+            </div>
+          </Link>
+        ))}
+      </div>
+    </section>
   );
 }

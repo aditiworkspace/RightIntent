@@ -2,7 +2,7 @@
 
 A premium Indian e-commerce storefront built with Next.js, TypeScript, Tailwind CSS, Supabase Auth, and MongoDB.
 
-`New RTF Text.md` is the primary product and feature specification. The latest implementation decision uses both services: Supabase provides Auth, OAuth sessions, and Storage; MongoDB provides application data such as products, inventory, carts, orders, coupons, reviews, wishlists, and customer profiles.
+`New RTF Text.md` is the primary product and feature specification. Supabase provides Auth, OAuth sessions, Storage, and the product catalog. Each `public.products` row stores the product details, subcategory, stock, image metadata, and variant data; `categories` remains a lookup table, while image files remain in the `product-images` Storage bucket. Row Level Security protects the product table.
 
 ## Run locally
 
@@ -12,7 +12,7 @@ Copy-Item .env.example .env.local
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). The current home page uses replaceable sample catalog data from `src/lib/products.ts`; product images can later move to Supabase Storage without changing the UI structure.
+Open [http://localhost:3000](http://localhost:3000). Storefront product pages and the admin catalog read product data from the same Supabase row; image files are stored in Supabase Storage and their metadata is kept on that row.
 
 Development uses Webpack instead of Turbopack to avoid recurring Windows `EPERM` errors when Turbopack replaces generated server manifests.
 
@@ -24,11 +24,11 @@ Provider setup instructions for Supabase email/Gmail OTP, phone SMS OTP, Google 
 
 ## Next implementation phases
 
-1. Apply the MongoDB seed script and connect live catalog reads.
-2. Keep Supabase Auth and server-side MongoDB admin authorization.
+1. Seed and manage product catalog rows through Supabase.
+2. Keep Supabase Auth and server-side admin authorization.
 3. Move catalog reads and cart mutations into Server Actions.
 4. Add Razorpay order creation, signature verification, and webhook handling.
-5. Add product, order, inventory, review, and customer admin screens.
+5. Continue refining product, order, inventory, review, and customer admin screens.
 
 ## Commands
 

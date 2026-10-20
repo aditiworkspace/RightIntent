@@ -1,8 +1,8 @@
 export type PriceLine = { unitPriceInr: number; quantity: number };
 export type CouponRule = { discountType: "percentage" | "fixed"; discountValue: number; minimumOrderInr: number };
 
-export const FREE_SHIPPING_THRESHOLD_INR = 2000;
-export const STANDARD_SHIPPING_INR = 120;
+export const FREE_SHIPPING_THRESHOLD_INR = 999;
+export const STANDARD_SHIPPING_INR = 0;
 
 export function calculateSubtotal(lines: PriceLine[]) {
   return lines.reduce((total, line) => total + line.unitPriceInr * line.quantity, 0);

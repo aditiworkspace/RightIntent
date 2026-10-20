@@ -1,17 +1,18 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { HomeClient } from "@/components/store/home/home-client";
 import { AnnouncementBar } from "@/components/store/home/announcement-bar";
 import { HeroSection } from "@/components/store/home/hero-section";
 import { IntentionRail } from "@/components/store/home/intention-rail";
+import { LuxuryMarquee } from "@/components/store/home/luxury-marquee";
 import { ManifestoSection } from "@/components/store/home/manifesto-section";
 import { CategoriesSection } from "@/components/store/home/categories-section";
 import { StorySection } from "@/components/store/home/story-section";
-import { PerksSection } from "@/components/store/home/perks-section";
 import { JournalSection } from "@/components/store/home/journal-section";
 import { FaqSection } from "@/components/store/home/faq-section";
-import { NewsletterSection } from "@/components/store/home/newsletter-section";
 import { SiteFooter } from "@/components/store/home/site-footer";
 import { IntelligentTraderShowcase } from "@/components/store/intelligent-trader-showcase";
+import { getCatalogProducts } from "@/lib/catalog";
 
 export const metadata: Metadata = {
   title: "Journals, Planners & Tools to Build with Purpose",
@@ -30,7 +31,8 @@ const websiteStructuredData = siteUrl
     }
   : null;
 
-export default function Home() {
+export default async function Home() {
+  const featuredProducts = await getCatalogProducts();
   return (
     <>
       {websiteStructuredData && (
@@ -41,12 +43,16 @@ export default function Home() {
           }}
         />
       )}
-      <AnnouncementBar />
+      <Suspense fallback={null}>
+        <AnnouncementBar />
+      </Suspense>
       <HomeClient
+        featuredProducts={featuredProducts}
         aboveFeatured={
           <>
             <HeroSection />
             <IntentionRail />
+            <LuxuryMarquee />
             <IntelligentTraderShowcase />
             <ManifestoSection />
           </>
@@ -55,10 +61,8 @@ export default function Home() {
           <>
             <CategoriesSection />
             <StorySection />
-            <PerksSection />
             <JournalSection />
             <FaqSection />
-            <NewsletterSection />
             <SiteFooter />
           </>
         }
